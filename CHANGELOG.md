@@ -10,4 +10,6 @@
 - 三通道图表规范（`docs/chart-spec.md`）：Markdown 表格 + Mermaid + ASCII。
 - 报告模板与严谨性检查清单（`docs/report-template.md`）。
 - 零依赖 CSV 探查脚本 `scripts/csv-profile.mjs`。
+- 可选 DuckDB CLI 安装脚本 `scripts/setup-duckdb.ps1`（winget / GitHub 直链，UTF-8 BOM）。
 - 样例 CSV 与样例报告（`examples/`）。
+- 发布与分发指南 `PUBLISHING.md`。
