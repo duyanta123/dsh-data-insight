@@ -124,14 +124,16 @@ description: 数据洞察报告：输入原始数据（CSV 文件 / 粘贴表格
 - 若来自 SQL：记录来源查询（脱敏后写入附录），确认是否已聚合。
 
 ### DuckDB 直连
-- **启用检测**：`duckdb --version` 可用才走直连；不可用时 CSV/粘贴仍全功能，直连路径明确告知「需安装 DuckDB（见 scripts/setup-duckdb.ps1）」，不静默降级。
+- **启用检测**：`duckdb --version` 可用才走直连；不可用时 CSV/粘贴仍全功能，直连路径明确告知「需安装 DuckDB（Windows：scripts/setup-duckdb.ps1，macOS/Linux：scripts/setup-duckdb.sh）」，并引导用户运行对应平台的安装脚本，不静默降级。
 - **安全红线（必须遵守）**：
-  - 一律 `-readonly`，禁止任何写库 / 建表 / `INSTALL`/`LOAD` 之外的破坏性语句。
+  - 连接库文件 / 远程库时一律 `-readonly`（v1.5.5 实测会拦截 INSERT/CREATE 等写语句），禁止任何写库 / 建表 / 破坏性语句。
   - 连接串走环境变量 `DATA_INSIGHT_DB_URL`，禁止把密码写进命令或报告。
   - 查询加 `LIMIT`（默认 5000），列宽截断；超限提示分批。
-- **调用方式（直接调 CLI，勿写 Node spawn 包装——规避沙箱子进程管道 EPERM）**：
-  - CSV/Parquet 直接查：`duckdb -readonly -csv -c "SELECT * FROM read_csv_auto('data.csv') LIMIT 100"`
-  - 远程库：`duckdb -readonly -csv -c "SELECT ... LIMIT 5000" "$env:DATA_INSIGHT_DB_URL"`
+- **调用方式（直接调 CLI，勿写 Node spawn 包装——规避沙箱子进程管道 EPERM；已在 v1.5.5 实测）**：
+  - CSV/Parquet 直接查（无库文件，**不加 `-readonly`**——不带库文件时 CLI 打开内存库，`-readonly` 会报 `Cannot launch in-memory database in read-only mode`；仅执行 SELECT，无持久化写入）：
+    `duckdb -csv -c "SELECT * FROM read_csv_auto('data.csv') LIMIT 100"`
+  - 库文件 / 远程库（`-readonly` 强制只读，连接串走环境变量）：
+    `duckdb -readonly -csv -c "SELECT ... LIMIT 5000" "$env:DATA_INSIGHT_DB_URL"`（POSIX shell 为 `"$DATA_INSIGHT_DB_URL"`）
 
 ---
 

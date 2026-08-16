@@ -2,6 +2,16 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/) 约定。
 
+## [0.1.1] - 2026-08-16
+
+### 修复
+- DuckDB 直连调用方式（SKILL.md / README）：CSV/Parquet 无库查询去掉 `-readonly`——v1.5.5 实测不带库文件时 CLI 打开内存库，`-readonly` 会报 `Cannot launch in-memory database in read-only mode`；`-readonly` 保留用于库文件 / 远程库连接（实测 INSERT 等写语句被拦截）。
+
+### 新增
+- `scripts/setup-duckdb.sh`：macOS/Linux 安装脚本（brew / GitHub release / `~/.local/bin`），与 Windows 版 `setup-duckdb.ps1` 对齐。
+- `test/csv-profile.test.mjs`：csv-profile CLI 契约测试（`node:test` 零依赖，10 例：分隔符探测 / 引号与转义 / 千分位 / 混合类型降级 / 残缺行 / `--limit` / BOM / 退出码），`npm test` 运行。
+- runbook：CLI 缺失时引导运行对应平台的安装脚本。
+
 ## [0.1.0] - 2026-08-16
 
 ### 新增

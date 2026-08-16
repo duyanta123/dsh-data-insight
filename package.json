@@ -1,9 +1,12 @@
 {
   "name": "dsh-data-insight",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DSH (DeepSeek Harness) data-insight skill plugin: turn raw data (CSV / pasted table / SQL results / DuckDB) into a structured Markdown report with business conclusions, metrics and charts.",
   "license": "MIT",
   "type": "module",
+  "scripts": {
+    "test": "node --test test/csv-profile.test.mjs"
+  },
   "main": "./plugin/index.js",
   "exports": {
     ".": "./plugin/index.js",

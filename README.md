@@ -20,7 +20,7 @@ dsh plugin --profile web add dsh-data-insight
 
 或手动两步（在目标 profile 目录下）：
 
-1. `package.json` 的 `dependencies` 加 `"dsh-data-insight": "^0.1.0"`；
+1. `package.json` 的 `dependencies` 加 `"dsh-data-insight": "^0.1.1"`；
 2. `dsh.profile.bundles` 数组加 `"dsh-data-insight"`。
 
 重启 profile 后，技能 `data-insight-runbook` 出现在技能列表即可用。
@@ -47,20 +47,23 @@ dsh-data-insight/
 ├── docs/chart-spec.md       # 三通道图表规范与示例
 ├── docs/report-template.md  # 报告骨架 + 严谨性检查清单
 ├── scripts/csv-profile.mjs  # 零依赖 CSV 探查脚本
+├── scripts/setup-duckdb.ps1 # DuckDB CLI 安装脚本（Windows）
+├── scripts/setup-duckdb.sh  # DuckDB CLI 安装脚本（macOS/Linux）
 └── examples/                # 样例 CSV + 样例报告
 ```
 
 ## DuckDB 直连（可选）
 
-默认零依赖；如需直连数据库，安装 [DuckDB](https://duckdb.org/) 单文件 CLI（加入 PATH）：
+默认零依赖；如需直连数据库，安装 [DuckDB](https://duckdb.org/) 单文件 CLI（加入 PATH）。可使用安装脚本：Windows `scripts/setup-duckdb.ps1`，macOS/Linux `scripts/setup-duckdb.sh`。
 
 ```sh
-# 连接串走环境变量，强制只读
-duckdb -readonly -csv -c "SELECT * FROM read_csv_auto('data.csv') LIMIT 100"
+# CSV/Parquet 直接查：无库文件，不加 -readonly（v1.5.5 实测 -readonly 打不开内存库会报错）
+duckdb -csv -c "SELECT * FROM read_csv_auto('data.csv') LIMIT 100"
+# 库文件 / 远程库：连接串走环境变量，强制只读（POSIX shell 为 "$DATA_INSIGHT_DB_URL"）
 duckdb -readonly -csv -c "SELECT ... LIMIT 5000" "$env:DATA_INSIGHT_DB_URL"
 ```
 
-安全红线：一律 `-readonly`；连接串走环境变量 `DATA_INSIGHT_DB_URL`；查询默认 `LIMIT 5000`。
+安全红线：连接库一律 `-readonly`（写语句会被拦截）；连接串走环境变量 `DATA_INSIGHT_DB_URL`；查询默认 `LIMIT 5000`。
 
 ## 参考文档
 

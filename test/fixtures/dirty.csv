@@ -1,0 +1,9 @@
+id,name,amount,flag,date,note
+1,"Zhang, San","1,234",是,2025-01-01,"said ""ok"""
+2,Li Si,5678.5,true,2025-01-02,normal
+3,"Wang ""Wu""","9,876",no,01/02/2025,bad date
+4,,12,是,2025-01-04,
+5,Zhao Liu,,,,,
+6,Li Si,5678.5,true,2025-01-02,normal
+7,Mixed Type,text,否,2025-01-07,mixed
+8,中文姓名,3.14,false,2025-01-08,unicode
