@@ -4,6 +4,14 @@
   "description": "DSH (DeepSeek Harness) data-insight skill plugin: turn raw data (CSV / pasted table / SQL results / DuckDB) into a structured Markdown report with business conclusions, metrics and charts.",
   "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duyanta123/dsh-data-insight.git"
+  },
+  "bugs": {
+    "url": "https://github.com/duyanta123/dsh-data-insight/issues"
+  },
+  "homepage": "https://github.com/duyanta123/dsh-data-insight#readme",
   "scripts": {
     "test": "node --test test/csv-profile.test.mjs"
   },
