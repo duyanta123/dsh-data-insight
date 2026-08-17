@@ -2,6 +2,15 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/) 约定。
 
+## [Unreleased]
+
+### 新增
+- `package.json` 补充 `repository` / `bugs` / `homepage` 元数据。
+- GitHub Actions CI（`.github/workflows/ci.yml`）：ubuntu + windows 矩阵运行 csv-profile 契约测试。
+- `.editorconfig`：统一缩进 / 换行 / 编码基线（PowerShell 脚本保持 CRLF）。
+- README「排障」章节：DuckDB 只读模式、CLI 缺失、GBK 编码、脏数据核对、Mermaid 本地渲染。
+- `test/fixtures/README.md`：三个 fixture 的场景与验证点说明。
+
 ## [0.1.1] - 2026-08-16
 
 ### 修复
