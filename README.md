@@ -70,6 +70,14 @@ duckdb -readonly -csv -c "SELECT ... LIMIT 5000" "$env:DATA_INSIGHT_DB_URL"
 
 安全红线：连接库一律 `-readonly`（写语句会被拦截）；连接串走环境变量 `DATA_INSIGHT_DB_URL`；查询默认 `LIMIT 5000`。
 
+## 排障
+
+- **DuckDB 报 `Cannot launch in-memory database in read-only mode`**：无库文件查询（CSV/Parquet）不要加 `-readonly`，见上方示例；`-readonly` 仅用于库文件 / 远程库。
+- **`duckdb: command not found`**：CLI 未安装或不在 PATH，运行对应平台安装脚本（`scripts/setup-duckdb.ps1` / `setup-duckdb.sh`）后重开终端。
+- **CSV 中文乱码**：优先 UTF-8（带 BOM 也能正确处理）；GBK 编码文件先用 `iconv -f GBK -t UTF-8` 转码再探查。
+- **指标结论与预期不符**：先用 `node scripts/csv-profile.mjs <file>` 看探查报告里的缺失值 / 重复行 / 异常值分布——样例数据实测中发现过单行脏数据驱动整体暴增、重复行抬高计数、缺失值拉低均值三类问题，探查阶段都能暴露。
+- **Mermaid 图在本地 Markdown 预览不渲染**：`file://` 协议下 CDN 加载的 mermaid.js 受同源策略限制，用 Typora 等本地渲染编辑器打开，或参考 `docs/chart-spec.md` 换用 Markdown 表格 / ASCII 条形图通道。
+
 ## 参考文档
 
 - `skills/data-insight-runbook/SKILL.md` — 完整流程与门槛
