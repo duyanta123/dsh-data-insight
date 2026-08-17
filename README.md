@@ -1,5 +1,10 @@
 # dsh-data-insight
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![DeepSeek Harness](https://img.shields.io/badge/DeepSeek%20Harness-plugin-4c1d95)](https://github.com/topics/dsh-plugin)
+[![dsh-index](https://img.shields.io/badge/dsh--index-dsh--data--insight-blue)](https://dsh-index.xlings.org/packages/dsh-data-insight/)
+[![version](https://img.shields.io/badge/version-0.1.1-green)](CHANGELOG.md)
+
 DSH（DeepSeek Harness）**数据洞察技能插件**：把原始数据变成「业务结论 + 指标数据 + 图表」的结构化 Markdown 分析报告。
 
 纯指令型技能插件，零依赖、零构建。计算由宿主已提供的文件 / Shell 工具驱动的 LLM 完成，包内附带一个零依赖的 CSV 探查脚本与完整图表 / 报告规范。
