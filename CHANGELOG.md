@@ -2,6 +2,11 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/) 约定。
 
+## [Unreleased]
+
+### 新增
+- `prepublishOnly` 钩子：npm 发布前自动运行测试门禁。
+
 ## [0.1.2] - 2026-09-02
 
 ### 新增

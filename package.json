@@ -13,7 +13,8 @@
   },
   "homepage": "https://github.com/duyanta123/dsh-data-insight#readme",
   "scripts": {
-    "test": "node --test test/csv-profile.test.mjs"
+    "test": "node --test test/csv-profile.test.mjs",
+    "prepublishOnly": "npm test"
   },
   "main": "./plugin/index.js",
   "exports": {
