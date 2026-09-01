@@ -2,7 +2,7 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/) 约定。
 
-## [Unreleased]
+## [0.1.2] - 2026-09-02
 
 ### 新增
 - `package.json` 补充 `repository` / `bugs` / `homepage` 元数据。
