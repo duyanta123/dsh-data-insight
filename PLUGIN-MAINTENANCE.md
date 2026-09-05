@@ -8,7 +8,7 @@
 | 项 | 值 |
 |---|---|
 | 类型 | 数据型（原始数据 → 洞察报告） |
-| 当前版本 | 0.1.2 |
+| 当前版本 | 0.1.3 |
 | 分发状态 | dsh-index / awesome-dsh-plugin / awesome-deepseek-harness 已收录 |
 | 运行时 | 零构建 ESM，`plugin/index.js` 由 harness 加载 |
 | 核心脚本 | `scripts/csv-profile.mjs`（零依赖 CSV 探查）+ `scripts/setup-duckdb.ps1/.sh` |

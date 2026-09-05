@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![DeepSeek Harness](https://img.shields.io/badge/DeepSeek%20Harness-plugin-4c1d95)](https://github.com/topics/dsh-plugin)
 [![dsh-index](https://img.shields.io/badge/dsh--index-dsh--data--insight-blue)](https://dsh-index.xlings.org/packages/dsh-data-insight/)
-[![version](https://img.shields.io/badge/version-0.1.2-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.1.3-green)](CHANGELOG.md)
 
 DSH（DeepSeek Harness）**数据洞察技能插件**：把原始数据变成「业务结论 + 指标数据 + 图表」的结构化 Markdown 分析报告。
 
@@ -25,7 +25,7 @@ dsh plugin --profile web add dsh-data-insight
 
 或手动两步（在目标 profile 目录下）：
 
-1. `package.json` 的 `dependencies` 加 `"dsh-data-insight": "^0.1.2"`；
+1. `package.json` 的 `dependencies` 加 `"dsh-data-insight": "^0.1.3"`；
 2. `dsh.profile.bundles` 数组加 `"dsh-data-insight"`。
 
 重启 profile 后，技能 `data-insight-runbook` 出现在技能列表即可用。
