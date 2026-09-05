@@ -34,8 +34,8 @@ dsh-data-insight/
 ## 3. CI 与测试门禁
 
 - **独立脚本回归**：`npm test`（=`node --test test/csv-profile.test.mjs`），当前 **10 例**；该矩阵只验证业务脚本。
-- **DSH 宿主兼容**：`npm run test:compat` 固定 `@deepseek-ai/dsh@0.1.2-rc.1`，要求 Node >=22.12，执行临时 profile 的 add、dump-config 和有限时长启动。
-- **GitHub Actions**：`.github/workflows/ci.yml` 保留业务回归，并增加 Node 22.12 compat job。
+- **DSH 宿主兼容**：`npm run test:compat` 固定 `@deepseek-ai/dsh@0.1.2-rc.1`，要求 Node >=22.19，执行临时 profile 的 add、dump-config 和有限时长启动。
+- **GitHub Actions**：`.github/workflows/ci.yml` 保留业务回归，并增加 Node 22.19 compat job。
 - 覆盖点：分隔符探测 / 引号与转义 / 千分位 / 混合类型降级 / 残缺行 / `--limit` / BOM / 退出码。
 
 ## 4. 一次完整变更的动作序列
@@ -79,7 +79,7 @@ dsh-data-insight/
 - [ ] `npm test` 全绿（10 例）
 - [ ] 涉及 DuckDB 时，两种模式均已真机验证（内存库 / 只读库）
 - [ ] `CHANGELOG.md` 已归并 `Unreleased`
-- [ ] `npm run test:compat` 通过（DSH 0.1.2-rc.1 / Node 22.12+）
+- [ ] `npm run test:compat` 通过（DSH 0.1.2-rc.1 / Node 22.19+）
 - [ ] `package.json` `version` 与 tag 一致
 - [ ] `files` 字段包含所有应发布文件
 - [ ] 对外描述若变，列表条目已同步（或已提交 PR）

@@ -73,7 +73,7 @@ duckdb -readonly -csv -c "SELECT ... LIMIT 5000" "$env:DATA_INSIGHT_DB_URL"
 ## 环境要求
 
 - 独立 CSV / DuckDB 脚本：Node.js >= 18。
-- DSH 0.1.2-rc.1 宿主：Node.js >= 22.12。
+- DSH 0.1.2-rc.1 宿主：Node.js >= 22.19。
 
 ## 排障
 
