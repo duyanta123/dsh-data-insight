@@ -5,6 +5,8 @@
 ## [Unreleased]
 
 ### 新增
+- 固定 `@deepseek-ai/dsh@0.1.2-rc.1` 的 `npm run test:compat` 门禁及 Windows/Ubuntu Node 22.12 CI，覆盖隔离 profile 的 add、配置 dump 和有限时长启动。
+- README 将依赖示例更新为 `^0.1.2`，并区分独立脚本与 DSH 宿主的 Node 兼容要求。
 - `prepublishOnly` 钩子：npm 发布前自动运行测试门禁。
 
 ## [0.1.2] - 2026-09-02
