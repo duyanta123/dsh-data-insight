@@ -1,6 +1,6 @@
 # dsh-data-insight 维护规则（Maintenance Runbook）
 
-> 本文档是 dsh-data-insight 仓库的专属维护基准，与顶层 [PLUGIN-MAINTENANCE.md](../../docs/PLUGIN-MAINTENANCE.md) 通用规则配套使用。本文件聚焦本仓库的细节。
+> 本文档是 dsh-data-insight 仓库的专属维护基准，与工作区顶层 docs/PLUGIN-MAINTENANCE.md 通用规则配套使用（该文件位于本仓库之外）。本文件聚焦本仓库的细节。
 > 原则：**不改不动，要改就一步到位**——代码/技能、测试、CHANGELOG、版本号、tag 一起改，不留下半成品版本。
 
 ## 1. 仓库概况
@@ -8,7 +8,7 @@
 | 项 | 值 |
 |---|---|
 | 类型 | 数据型（原始数据 → 洞察报告） |
-| 当前版本 | 0.1.3 |
+| 当前版本 | 0.1.4 |
 | 分发状态 | dsh-index / awesome-dsh-plugin / awesome-deepseek-harness 已收录 |
 | 运行时 | 零构建 ESM，`plugin/index.js` 由 harness 加载 |
 | 核心脚本 | `scripts/csv-profile.mjs`（零依赖 CSV 探查）+ `scripts/setup-duckdb.ps1/.sh` |
@@ -66,8 +66,9 @@ dsh-data-insight/
 - `skills/data-insight-runbook/SKILL.md` 的阶段 / 硬门槛变更，或 `docs/chart-spec.md`、`docs/report-template.md` 调整：确保与脚本实际输出和 DuckDB 命令一致。
 
 ### 5.4 元数据与打包
-- 改动对外描述时同步：`README.md` 首段、`package.json` 的 `description`/`keywords`、awesome-dsh-plugin 的 `data/plugins/duyanta123__dsh-data-insight.yml`。
-- `files` 白名单已含 `plugin/`、`cordis.patch.yml`、`skills/`、`docs/`、`scripts/`、`examples/`、`README.md`、`CHANGELOG.md`、`PUBLISHING.md`、`LICENSE`。
+- 改动对外描述时同步：`README.md` / `README.zh-CN.md` 首段（双语，结构一致）、`package.json` 的 `description`/`keywords`、awesome-dsh-plugin 的 `data/plugins/duyanta123__dsh-data-insight.yml`。
+- 发版时同步双语 README 的 version 徽章、安装示例 tag 与手动安装依赖版本。
+- `files` 白名单已含 `plugin/`、`cordis.patch.yml`、`skills/`、`docs/`、`scripts/`、`examples/`、双语 `README.md`/`README.zh-CN.md`、`CHANGELOG.md`、`PUBLISHING.md`、`LICENSE`——`PLUGIN-MAINTENANCE.md` 为仓库维护资产，不在 npm 包内；新增顶层资产时记得核对。
 
 ## 6. 版本与发布节奏
 
@@ -81,6 +82,7 @@ dsh-data-insight/
 - [ ] `CHANGELOG.md` 已归并 `Unreleased`
 - [ ] `npm run test:compat` 通过（DSH 0.1.5-rc.2 / Node 22.19+）
 - [ ] `package.json` `version` 与 tag 一致
+- [ ] 双语 README 的 version 徽章与安装示例 tag 已同步
 - [ ] `files` 字段包含所有应发布文件
 - [ ] 对外描述若变，列表条目已同步（或已提交 PR）
 - [ ] 推送 `main`，GitHub Actions 全绿

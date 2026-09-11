@@ -1,79 +1,61 @@
-# 发布与分发指南（PUBLISHING）
+# Publishing
 
-本文档记录 `dsh-data-insight` 从源码到分发的完整步骤，供维护者在有网终端执行。
+> 本文是 dsh-data-insight 的发布手册，结构遵循工作区顶层 docs/PUBLISHING-TEMPLATE.md 模板（该文件位于插件仓库之外，不在本仓库内）；其他插件仓库的 PUBLISHING.md 同构。
 
-## 当前状态（构建侧已就绪）
+## 1. 命名与分发身份
 
-- 包结构 14 个文件已建成；`node --check`、JSON、插件 API、SKILL.md frontmatter 均已校验通过。
-- `csv-profile.mjs` 已在 `examples/sample-sales.csv` 上跑通。
-- `setup-duckdb.ps1` 语法校验通过（UTF-8 BOM），版本探测数据源 `duckdb.org/data/latest_stable_version.txt` 实测返回 `1.5.5`。
-- 已 `git init` + 初始 commit（本地 `main` 分支）。
-- npm 包名 `dsh-data-insight` 已确认未被占用（`npm view` 返回 404）。
+- npm 包名：`dsh-data-insight`（与 GitHub 仓库名一致，2026-09 首发时经 `npm view` 确认未占用）。
+- GitHub 仓库名：`duyanta123/dsh-data-insight`。
+- exports 仅根路径（`./plugin/index.js`），无 bin 命令、无子路径导出。
+- cordis.patch.yml 插件行 id/name 为 `dsh-data-insight`。
+- README 双语：`README.md` 为英文、`README.zh-CN.md` 为中文，顶部互链；两者章节结构必须一致，改动描述时同步更新。
 
-## 前置条件
+## 2. 发布前检查清单
 
-- 一个有网、能访问 github.com 与 registry.npmjs.org 的终端。
-- 已登录 npm：`npm login`（需要 npm 账号 + 2FA）。
-- GitHub 账号（用于建仓库与 push）。
+1. 运行 `npm test`（`node --test test/csv-profile.test.mjs`，当前 10 例，全绿）。
+2. 运行 `node --check scripts/csv-profile.mjs` 与 `npm run test:compat`。
+3. 改动过 DuckDB 命令时，真机验证**两个模式**：无库文件（内存库，不加 `-readonly`）与有库文件（`-readonly` 只读）。历史教训：DuckDB v1.5.5 实测内存库加 `-readonly` 会报错。
+4. 运行 `npm pack --dry-run`，确认包含 `plugin/index.js`、`cordis.patch.yml`、`skills/`、`docs/`、`scripts/`、`examples/`、双语 `README.md`/`README.zh-CN.md`、`CHANGELOG.md`、`PUBLISHING.md`、`LICENSE`。
+5. 版本一致性核对：`package.json` version、`CHANGELOG.md` 发布段、git tag 三处一致。
+6. 版本徽章同步：双语 README 的 version 徽章、安装示例 tag、手动安装依赖版本指向最新发布版本。
 
-## 步骤 1：发布到 GitHub
+## 3. DSH bundle 契约（对齐 2026-09 现行契约）
 
-```powershell
-# 1) 浏览器打开 https://github.com/new，仓库名 dsh-data-insight，公开，
-#    不要勾选 "Initialize with README / .gitignore / license"（本地已有）。
-cd D:\Agent预设\UI\dsh-data-insight
-git remote add origin https://github.com/<你的用户名>/dsh-data-insight.git
-git push -u origin main
-```
+- `package.json` 声明 `dsh.bundle.patch: ./cordis.patch.yml`——harness 只激活声明该字段的包。
+- `cordis.patch.yml` 为 config-tree `- insert:` 补丁格式；harness 加载 `main`（`plugin/index.js`）。
+- `plugin/index.js` 经官方 `@deepseek-ai/dsh-skill-filesystem` 的 `FileSystemSkillProvider` 注册 `skills/` 为技能根（includeDefaultRoots: false）。
+- `skills/data-insight-runbook/SKILL.md` frontmatter 必填 `name`（kebab-case）+ `description`。
+- 安装契约：`dsh plugin --profile <profile> add "github:owner/repo#ref"`；兼容基线 `@deepseek-ai/dsh@0.1.5-rc.2`（Node >= 22.19）。
 
-推送后打一个版本 tag（可选但推荐，供 `dsh plugin add github:...#vX.Y.Z` 引用）：
+## 4. 发布渠道
 
-```powershell
-git tag v0.1.0
-git push origin v0.1.0
-```
+### GitHub
 
-## 步骤 2：发布到 npm
+1. push `main`，确认 CI 全绿（ubuntu + windows × Node 22 回归 + Node 22.19 DSH compat job）。
+2. 打 tag `v0.x.y`（与 `package.json` version 一致，如当前 `v0.1.4`）并推送。
+3. 给仓库添加 GitHub topic `dsh-plugin`（awesome 收录门槛之一）。
 
-```powershell
-cd D:\Agent预设\UI\dsh-data-insight
-npm view dsh-data-insight version   # 再次确认包名可用（应 404）
-npm login                           # 首次需要；已登录可跳过
-npm publish --access public
-```
+### npm
 
-## 步骤 3：安装到 profile（二选一）
+1. `npm login`（需要 npm 账号 + 2FA）。
+2. `npm publish --access public`（`prepublishOnly` 会先跑 `npm test`）。
+3. 发布后核对 `npm view dsh-data-insight version` 与 dist-tags。
 
-发布后，任选一种分发形态安装：
+### awesome 列表收录（已收录，改描述时同步）
 
-```powershell
-# npm 形态
-dsh plugin --profile web add dsh-data-insight
+- awesome-dsh-plugin：同步 `data/plugins/duyanta123__dsh-data-insight.yml` 的描述与分类。
+- awesome-deepseek-harness：同步 README 条目（真实仓库 + 一句话 + 链接，en/zh 同 PR）。
+- dsh-index：已收录（`https://dsh-index.xlings.org/packages/dsh-data-insight/`），技能元数据变更时同步提交。
 
-# GitHub 形态（与 dsh-preset-scaffold 一致）
-dsh plugin --profile web add github:<你的用户名>/dsh-data-insight#v0.1.0
-```
-
-> 本地开发期可用 `file:` 链接（无需发布）：
-> 在 profile 的 `package.json` 里加 `"dsh-data-insight": "file:D:/Agent预设/UI/dsh-data-insight"`，
-> 并在 `dsh.profile.bundles` 数组加 `"dsh-data-insight"`，然后 `pnpm install`。
-
-## 步骤 4：验证
+## 5. 安装验证（发布后）
 
 1. 重启 profile（`dsh web` 重开），技能列表应出现 `data-insight-runbook`。
 2. 说「分析 examples/sample-sales.csv 出报告」，确认五阶段执行并产出报告。
 3. 可选：`scripts/setup-duckdb.ps1` 装 DuckDB 后，验证直连只读查询。
 
-## 常见问题
+## 6. 常见问题
 
 - **`npm publish` 报 403/404**：包名被占或未登录；用 `npm whoami` 检查登录态。
 - **`dsh plugin add` 报找不到包**：确认包已发布且 profile 的 `dsh.profile.bundles` 含包名。
 - **技能没出现**：重启 profile 才加载 bundle patch；确认 `cordis.patch.yml` 随包发布（`files` 字段已包含）。
 - **DuckDB 直连被拒**：runbook 强制 `-readonly`；连接串走环境变量 `DATA_INSIGHT_DB_URL`，不要写进命令/报告。
-
-## 本地开发循环（改技能内容后）
-
-1. 改 `skills/`、`docs/`、`scripts/` 下的文件。
-2. 本地 `file:` 链接形态下，改 `skills/` 无需重装（FileSystemSkillProvider 会 watch 技能根）。
-3. 改 `plugin/index.js` / `cordis.patch.yml` / `package.json` 后需 `pnpm install` 并重启 profile。
-4. 提交前：`node --check scripts/csv-profile.mjs`、PowerShell 语法校验、`git status` 确认。
