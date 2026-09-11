@@ -6,7 +6,7 @@ import { dirname, join, resolve, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import process from "node:process";
 
-const DSH_VERSION = "0.1.2-rc.1";
+const DSH_VERSION = "0.1.5-rc.2";
 const MIN_NODE = [22, 19, 0];
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(await readFile(join(repoRoot, "package.json"), "utf8"));
