@@ -53,14 +53,14 @@ Say "analyze this CSV and give me a report", "take a look at this data", or "com
 ### 2. Use as a standalone profiling script
 
 ```sh
-node scripts/csv-profile.mjs examples/sample-sales.csv
+node skills/data-insight-runbook/scripts/csv-profile.mjs skills/data-insight-runbook/examples/sample-sales.csv
 ```
 
-Prints a profiling report for the CSV (schema / missing / distribution / outliers); the corresponding full report sample is [examples/sample-report.md](examples/sample-report.md).
+Prints a profiling report for the CSV (schema / missing / distribution / outliers); the corresponding full report sample is [examples/sample-report.md](skills/data-insight-runbook/examples/sample-report.md).
 
 ### 3. DuckDB direct connection (optional)
 
-Zero dependencies by default; to query databases directly, install the [DuckDB](https://duckdb.org/) single-file CLI (on PATH). Install scripts: Windows `scripts/setup-duckdb.ps1`, macOS/Linux `scripts/setup-duckdb.sh`.
+Zero dependencies by default; to query databases directly, install the [DuckDB](https://duckdb.org/) single-file CLI (on PATH). Install scripts: Windows `skills/data-insight-runbook/scripts/setup-duckdb.ps1`, macOS/Linux `skills/data-insight-runbook/scripts/setup-duckdb.sh`.
 
 ```sh
 # Query CSV/Parquet directly: no database file, no -readonly (v1.5.5: -readonly fails on in-memory databases)
@@ -81,7 +81,7 @@ duckdb -readonly -csv -c "SELECT ... LIMIT 5000" "$env:DATA_INSIGHT_DB_URL"
 
 ## Output
 
-The final artifact of the five-stage pipeline is a Markdown analysis report with a fixed skeleton defined in [docs/report-template.md](docs/report-template.md):
+The final artifact of the five-stage pipeline is a Markdown analysis report with a fixed skeleton defined in [docs/report-template.md](skills/data-insight-runbook/docs/report-template.md):
 
 - **Core conclusions** (each backed by numbers with cross-references)
 - **Data overview** (schema, missing values, duplicates, dispositions)
@@ -101,25 +101,25 @@ The final artifact of the five-stage pipeline is a Markdown analysis report with
 Don't pass `-readonly` for file-less queries (CSV/Parquet) — see the example above; `-readonly` is only for database files / remote databases.
 
 **`duckdb: command not found`?**
-The CLI isn't installed or isn't on PATH; run the platform install script (`scripts/setup-duckdb.ps1` / `setup-duckdb.sh`) and reopen the terminal.
+The CLI isn't installed or isn't on PATH; run the platform install script (`skills/data-insight-runbook/scripts/setup-duckdb.ps1` / `setup-duckdb.sh`) and reopen the terminal.
 
 **Garbled Chinese text in CSV?**
 Prefer UTF-8 (BOM is handled correctly); transcode GBK files first with `iconv -f GBK -t UTF-8`.
 
 **Metrics don't match expectations?**
-Run `node scripts/csv-profile.mjs <file>` first and check the profiling report's missing values / duplicate rows / outlier distribution — real-world sample data has surfaced three classes of issues (a single dirty row driving a spike, duplicates inflating counts, missing values dragging averages), all exposed at the profiling stage.
+Run `node skills/data-insight-runbook/scripts/csv-profile.mjs <file>` first and check the profiling report's missing values / duplicate rows / outlier distribution — real-world sample data has surfaced three classes of issues (a single dirty row driving a spike, duplicates inflating counts, missing values dragging averages), all exposed at the profiling stage.
 
 **Mermaid charts don't render in local Markdown preview?**
-Over `file://`, CDN-loaded mermaid.js is blocked by same-origin policy; open with a local renderer such as Typora, or switch to the Markdown table / ASCII bar chart channels per [docs/chart-spec.md](docs/chart-spec.md).
+Over `file://`, CDN-loaded mermaid.js is blocked by same-origin policy; open with a local renderer such as Typora, or switch to the Markdown table / ASCII bar chart channels per [docs/chart-spec.md](skills/data-insight-runbook/docs/chart-spec.md).
 
 **Old sessions won't open after upgrading the DSH host to 0.1.5.x?**
 The Session format V3 migration is irreversible and is host behavior; back up session logs before upgrading the host (see the 0.1.4 entry in [CHANGELOG.md](CHANGELOG.md)).
 
 ## Documentation
 
-- [docs/chart-spec.md](docs/chart-spec.md) — three-channel chart spec and examples (including the warning that the DSH Web GUI doesn't render Mermaid)
-- [docs/report-template.md](docs/report-template.md) — report skeleton + rigor checklist
-- [examples/](examples/) — sample CSV and full sample report
+- [docs/chart-spec.md](skills/data-insight-runbook/docs/chart-spec.md) — three-channel chart spec and examples (including the warning that the DSH Web GUI doesn't render Mermaid)
+- [docs/report-template.md](skills/data-insight-runbook/docs/report-template.md) — report skeleton + rigor checklist
+- [examples/](skills/data-insight-runbook/examples/) — sample CSV and full sample report
 - [CHANGELOG.md](CHANGELOG.md) — release notes
 - [PLUGIN-MAINTENANCE.md](PLUGIN-MAINTENANCE.md) — repo maintenance runbook
 
