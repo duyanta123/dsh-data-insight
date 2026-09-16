@@ -37,9 +37,15 @@
 
 ### npm
 
-1. `npm login`（需要 npm 账号 + 2FA）。
-2. `npm publish --access public`（`prepublishOnly` 会先跑 `npm test`）。
-3. 发布后核对 `npm view dsh-data-insight version` 与 dist-tags。
+1. 维护者账号为 `bugcome`；本机要执行 npm 写操作（如废弃旧版本）时先 `npm login`（浏览器授权；开了 2FA 的命令追加 `--otp=<code>`），用 `npm whoami` 确认登录态。
+2. 发布走 CI trusted publishing：推送 `v0.x.y` tag 触发 Publish Package workflow，在 Ubuntu runner 上以 OIDC 身份执行 `npm publish` 并自动附带 provenance，本地无需登录。本地备用路径：`npm login` 后 `npm publish --access public`（`prepublishOnly` 会先跑 `npm test`；此路径默认不带 provenance，首选仍是 tag 触发 CI）。
+3. 发布后核对：
+   - `npm view dsh-data-insight version` 与 `npm view dsh-data-insight dist-tags --json`（`latest` 应指向新版本）。
+   - `npm view dsh-data-insight@<ver> dist --json`：核对 `fileCount` / `unpackedSize` / `attestations.provenance`。
+   - 可选实装验证：`npm install --prefix <临时目录> dsh-data-insight@<ver> --no-save`，核对包内 `skills/...` 布局，并按 README 方式实跑 `csv-profile.mjs`。
+4. 废弃有问题的旧版本（对已发布版本的缺陷修复，发布后必做）：
+   - `npm deprecate dsh-data-insight@<ver> "<原因，建议升级目标>"`
+   - 复核 `npm view dsh-data-insight@<ver> deprecated`；撤销用 `npm deprecate dsh-data-insight@<ver> ""`。
 
 ### awesome 列表收录（已收录，改描述时同步）
 
