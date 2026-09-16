@@ -16,7 +16,8 @@ import { writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const script = join(root, "scripts", "csv-profile.mjs");
+const skill = join(root, "skills", "data-insight-runbook");
+const script = join(skill, "scripts", "csv-profile.mjs");
 const fixtures = join(root, "test", "fixtures");
 
 /** 跑 CLI，返回 { code, stdout, stderr, json } */
@@ -34,7 +35,7 @@ function run(...args) {
 const col = (report, name) => report.columnsDetail.find((c) => c.name === name);
 
 test("样例 CSV：行数/列数/重复行/缺失/异常值全链路", () => {
-  const { code, json } = run(join(root, "examples", "sample-sales.csv"), "--json");
+  const { code, json } = run(join(skill, "examples", "sample-sales.csv"), "--json");
   assert.equal(code, 0);
   assert.equal(json.rows, 31);
   assert.equal(json.columns, 5);
@@ -93,7 +94,7 @@ test("残缺行（少列/多列）不崩溃，少列计为缺失", () => {
 });
 
 test("--limit 截断数据行", () => {
-  const { json } = run(join(root, "examples", "sample-sales.csv"), "--json", "--limit", "5");
+  const { json } = run(join(skill, "examples", "sample-sales.csv"), "--json", "--limit", "5");
   assert.equal(json.rows, 5);
 });
 
@@ -127,7 +128,7 @@ test("UTF-8 BOM 剥离：首列名不带 \\uFEFF", () => {
 });
 
 test("文本模式输出为 Markdown 报告", () => {
-  const { stdout } = run(join(root, "examples", "sample-sales.csv"));
+  const { stdout } = run(join(skill, "examples", "sample-sales.csv"));
   assert.ok(stdout.includes("# CSV 数据探查报告"));
   assert.ok(stdout.includes("## Schema 与质量"));
   assert.ok(stdout.includes("重复行：1"));
