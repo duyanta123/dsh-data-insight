@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+### 修复
+- **技能资源路径与 harness 的解析基准不一致，导致 `SKILL.md` 中全部相对路径失效。** harness 加载技能时注入「Base directory for this skill: `<skills>/<name>`」并指示按该基准解析相对路径，而 `docs/`、`scripts/`、`examples/` 原先位于包根，故 `SKILL.md` 里的 `scripts/csv-profile.mjs`、`docs/chart-spec.md`、`docs/report-template.md` 等引用在 agent 运行时一律解析到不存在的路径（阶段 1 的探查脚本与阶段 4 的报告骨架、图表规范因此全部不可达）。现将三者移入 `skills/data-insight-runbook/`，技能目录自包含；相对路径书写不变，`SKILL.md` 无需改动。
+- `package.json` 的 `files` 字段随之移除包根 `docs/`、`scripts/`、`examples/` 条目（嵌套目录已由 `skills/` 递归包含，已用 `npm pack --dry-run` 验证）。
+- 双语 README、`PUBLISHING.md` 中的路径引用与文档链接同步更新。
+- `test/dsh-compat.test.mjs` 新增回归断言：技能引用的资源若存在于包内却位于技能目录之外，立即失败并给出修复指引——原测试只校验 `SKILL.md` frontmatter，未校验其引用的资源可达性，故未能拦住此问题。
+
 ## [0.1.4] - 2026-09-11
 
 ### 变更
