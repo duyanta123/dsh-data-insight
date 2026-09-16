@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, readFile, readdir, rm, stat } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, readdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { spawnSync, spawn } from "node:child_process";
 import { tmpdir } from "node:os";

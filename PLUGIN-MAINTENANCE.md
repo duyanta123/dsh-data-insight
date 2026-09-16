@@ -11,7 +11,7 @@
 | 当前版本 | 0.1.4 |
 | 分发状态 | dsh-index / awesome-dsh-plugin / awesome-deepseek-harness 已收录 |
 | 运行时 | 零构建 ESM，`plugin/index.js` 由 harness 加载 |
-| 核心脚本 | `scripts/csv-profile.mjs`（零依赖 CSV 探查）+ `scripts/setup-duckdb.ps1/.sh` |
+| 核心脚本 | `skills/data-insight-runbook/scripts/`：`csv-profile.mjs`（零依赖 CSV 探查）+ `setup-duckdb.ps1/.sh` |
 
 ## 2. 目录结构与职责
 
@@ -20,12 +20,13 @@ dsh-data-insight/
 ├── package.json                    # npm 包 + dsh.bundle.patch + files 白名单
 ├── cordis.patch.yml                # DSH bundle patch
 ├── plugin/index.js                 # 注册技能根
-├── skills/data-insight-runbook/SKILL.md   # 五阶段数据洞察 runbook
-├── scripts/csv-profile.mjs         # 确定性 CSV 探查（正确性核心）
-├── scripts/setup-duckdb.ps1/.sh    # 可选 DuckDB CLI 安装脚本（双平台）
-├── docs/chart-spec.md              # 三通道图表规范（表格/Mermaid/ASCII）
-├── docs/report-template.md         # 报告模板与严谨性检查清单
-├── examples/                       # 样例 CSV 与样例报告
+├── skills/data-insight-runbook/    # 技能目录（自包含；harness 按此目录解析 SKILL.md 的相对路径）
+│   ├── SKILL.md                    # 五阶段数据洞察 runbook
+│   ├── scripts/csv-profile.mjs     # 确定性 CSV 探查（正确性核心）
+│   ├── scripts/setup-duckdb.ps1/.sh  # 可选 DuckDB CLI 安装脚本（双平台）
+│   ├── docs/chart-spec.md          # 三通道图表规范（表格/Mermaid/ASCII）
+│   ├── docs/report-template.md     # 报告模板与严谨性检查清单
+│   └── examples/                   # 样例 CSV 与样例报告
 ├── test/csv-profile.test.mjs       # node --test 契约测试（当前 10 例）
 ├── test/dsh-compat.test.mjs        # DSH 0.1.5-rc.2 宿主兼容性门禁
 └── test/fixtures/                  # dirty.csv / ragged.csv / comma-numbers.csv
@@ -63,12 +64,12 @@ dsh-data-insight/
 - 修改 `setup-duckdb.ps1` 时保持 UTF-8 BOM（Windows PowerShell 兼容）；新增平台脚本时与另一平台对齐。
 
 ### 5.3 runbook / 模板调整
-- `skills/data-insight-runbook/SKILL.md` 的阶段 / 硬门槛变更，或 `docs/chart-spec.md`、`docs/report-template.md` 调整：确保与脚本实际输出和 DuckDB 命令一致。
+- `skills/data-insight-runbook/SKILL.md` 的阶段 / 硬门槛变更，或 `skills/data-insight-runbook/docs/` 下的 `chart-spec.md`、`report-template.md` 调整：确保与脚本实际输出和 DuckDB 命令一致。
 
 ### 5.4 元数据与打包
 - 改动对外描述时同步：`README.md` / `README.zh-CN.md` 首段（双语，结构一致）、`package.json` 的 `description`/`keywords`、awesome-dsh-plugin 的 `data/plugins/duyanta123__dsh-data-insight.yml`。
 - 发版时同步双语 README 的 version 徽章、安装示例 tag 与手动安装依赖版本。
-- `files` 白名单已含 `plugin/`、`cordis.patch.yml`、`skills/`、`docs/`、`scripts/`、`examples/`、双语 `README.md`/`README.zh-CN.md`、`CHANGELOG.md`、`PUBLISHING.md`、`LICENSE`——`PLUGIN-MAINTENANCE.md` 为仓库维护资产，不在 npm 包内；新增顶层资产时记得核对。
+- `files` 白名单已含 `plugin/index.js`、`cordis.patch.yml`、`skills/`（技能目录自包含：`SKILL.md` + `docs/` + `scripts/` + `examples/` 均在其下，已由 `skills/` 递归包含）、双语 `README.md`/`README.zh-CN.md`、`CHANGELOG.md`、`PUBLISHING.md`、`LICENSE`——`PLUGIN-MAINTENANCE.md` 为仓库维护资产，不在 npm 包内；新增顶层资产时记得核对。
 
 ## 6. 版本与发布节奏
 
