@@ -92,6 +92,60 @@ async function waitForExit(child, timeoutMs) {
   });
 }
 
+/**
+ * Verify that no resource referenced by a `SKILL.md` is shipped *outside* that
+ * skill's own directory.
+ *
+ * The harness injects `Base directory for this skill: <skills/<name>>` and
+ * instructs the agent to resolve the skill's relative paths against that base,
+ * so a resource kept at the package root (for example `scripts/` or `docs/`) is
+ * unreachable at agent runtime however it is spelled from the package root.
+ * Regression guard for shipped 0.1.4, where `data-insight-runbook/SKILL.md`
+ * pointed at `scripts/csv-profile.mjs` and `docs/*.md` while both directories
+ * lived at the package root, so every one of those references resolved to a
+ * missing file.
+ *
+ * Only references that resolve to an existing file *inside the package* are
+ * judged: names of artifacts the runbook tells the agent to create (for example
+ * `data-insight-report.md`) resolve to nothing and are intentionally ignored,
+ * which keeps this check free of false positives.
+ *
+ * @param skillName - the skill directory name (its `SKILL.md` parent).
+ * @param skillText - the raw `SKILL.md` contents.
+ */
+async function assertSkillResourcesResolve(skillName, skillText) {
+  const skillRoot = join(repoRoot, "skills", skillName);
+  const references = new Set();
+  // Markdown links: [label](path)
+  for (const match of skillText.matchAll(/\]\(([^)\s]+)\)/g)) references.add(match[1]);
+  // Inline code spans that name a file: `scripts/foo.mjs`, `foo.ps1`
+  for (const match of skillText.matchAll(/`([^`\s]+\.(?:mjs|js|ts|md|json|ps1|sh|csv))`/g)) references.add(match[1]);
+
+  const misplaced = [];
+  for (const raw of references) {
+    const target = raw.split("#")[0].split("?")[0];
+    if (target === "") continue;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(target)) continue; // absolute URL / other scheme
+    if (target.startsWith("/") || target.startsWith("\\")) continue; // absolute path
+    const candidates = [target];
+    try {
+      const decoded = decodeURIComponent(target);
+      if (decoded !== target) candidates.push(decoded);
+    } catch {
+      // A malformed escape sequence is reported through the literal candidate.
+    }
+    if (candidates.some((candidate) => existsSync(resolve(skillRoot, candidate)))) continue;
+    if (candidates.some((candidate) => existsSync(resolve(repoRoot, candidate)))) misplaced.push(raw);
+  }
+  if (misplaced.length > 0) {
+    throw new Error(
+      `skill ${skillName}: ${misplaced.length} referenced resource(s) ship outside the skill directory, `
+      + `so they cannot resolve against its base directory (skills/${skillName}/): ${misplaced.join(", ")}. `
+      + `Move them under skills/${skillName}/ (the harness resolves SKILL.md paths against that base).`,
+    );
+  }
+}
+
 async function runCompat() {
   if (!versionAtLeast(process.versions.node, MIN_NODE)) {
     throw new Error(`DSH ${DSH_VERSION} compat requires Node >=22.19.0; found ${process.versions.node}`);
@@ -102,11 +156,17 @@ async function runCompat() {
   if (skillDirs.length === 0) throw new Error("no skill directories found");
   if (!existsSync(join(repoRoot, "plugin", "index.js"))) throw new Error("plugin/index.js is missing");
   for (const skillDir of skillDirs) {
-    const skillText = await readFile(join(repoRoot, "skills", skillDir.name, "SKILL.md"), "utf8");
+    const skillPath = join(repoRoot, "skills", skillDir.name, "SKILL.md");
+    const skillText = await readFile(skillPath, "utf8");
     const frontmatter = skillText.match(/^---\s*\n([\s\S]*?)\n---/);
     if (!frontmatter || !/^name:\s*\S+/m.test(frontmatter[1]) || !/^description:\s*\S+/m.test(frontmatter[1])) {
       throw new Error(`invalid skill frontmatter: ${skillDir.name}`);
     }
+    // The harness resolves relative paths in SKILL.md against the skill's own
+    // directory (`Base directory for this skill: <skills/<name>>`), so every
+    // referenced resource must live under it. A reference that escapes the
+    // skill directory resolves to a missing file at agent runtime.
+    await assertSkillResourcesResolve(skillDir.name, skillText);
   }
 
   const workRoot = await mkdtemp(join(tmpdir(), "dsh-compat-"));

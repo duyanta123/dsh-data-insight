@@ -53,14 +53,14 @@ npm install dsh-data-insight
 ### 2. 作为独立探查脚本使用
 
 ```sh
-node scripts/csv-profile.mjs examples/sample-sales.csv
+node skills/data-insight-runbook/scripts/csv-profile.mjs skills/data-insight-runbook/examples/sample-sales.csv
 ```
 
-会输出该 CSV 的探查报告（schema / 缺失 / 分布 / 异常），对应完整报告样例见 [examples/sample-report.md](examples/sample-report.md)。
+会输出该 CSV 的探查报告（schema / 缺失 / 分布 / 异常），对应完整报告样例见 [examples/sample-report.md](skills/data-insight-runbook/examples/sample-report.md)。
 
 ### 3. DuckDB 直连（可选）
 
-默认零依赖；如需直连数据库，安装 [DuckDB](https://duckdb.org/) 单文件 CLI（加入 PATH）。可使用安装脚本：Windows `scripts/setup-duckdb.ps1`，macOS/Linux `scripts/setup-duckdb.sh`。
+默认零依赖；如需直连数据库，安装 [DuckDB](https://duckdb.org/) 单文件 CLI（加入 PATH）。可使用安装脚本：Windows `skills/data-insight-runbook/scripts/setup-duckdb.ps1`，macOS/Linux `skills/data-insight-runbook/scripts/setup-duckdb.sh`。
 
 ```sh
 # CSV/Parquet 直接查：无库文件，不加 -readonly（v1.5.5 实测 -readonly 打不开内存库会报错）
@@ -81,7 +81,7 @@ duckdb -readonly -csv -c "SELECT ... LIMIT 5000" "$env:DATA_INSIGHT_DB_URL"
 
 ## 输出
 
-五阶段流水线的最终产物是一份 Markdown 分析报告，固定骨架见 [docs/report-template.md](docs/report-template.md)：
+五阶段流水线的最终产物是一份 Markdown 分析报告，固定骨架见 [docs/report-template.md](skills/data-insight-runbook/docs/report-template.md)：
 
 - **核心结论**（每条带数字支撑与交叉引用）
 - **数据概况**（schema、缺失、重复、处置记录）
@@ -101,25 +101,25 @@ duckdb -readonly -csv -c "SELECT ... LIMIT 5000" "$env:DATA_INSIGHT_DB_URL"
 无库文件查询（CSV/Parquet）不要加 `-readonly`，见上方示例；`-readonly` 仅用于库文件 / 远程库。
 
 **`duckdb: command not found`？**
-CLI 未安装或不在 PATH，运行对应平台安装脚本（`scripts/setup-duckdb.ps1` / `setup-duckdb.sh`）后重开终端。
+CLI 未安装或不在 PATH，运行对应平台安装脚本（`skills/data-insight-runbook/scripts/setup-duckdb.ps1` / `setup-duckdb.sh`）后重开终端。
 
 **CSV 中文乱码？**
 优先 UTF-8（带 BOM 也能正确处理）；GBK 编码文件先用 `iconv -f GBK -t UTF-8` 转码再探查。
 
 **指标结论与预期不符？**
-先用 `node scripts/csv-profile.mjs <file>` 看探查报告里的缺失值 / 重复行 / 异常值分布——样例数据实测中发现过单行脏数据驱动整体暴增、重复行抬高计数、缺失值拉低均值三类问题，探查阶段都能暴露。
+先用 `node skills/data-insight-runbook/scripts/csv-profile.mjs <file>` 看探查报告里的缺失值 / 重复行 / 异常值分布——样例数据实测中发现过单行脏数据驱动整体暴增、重复行抬高计数、缺失值拉低均值三类问题，探查阶段都能暴露。
 
 **Mermaid 图在本地 Markdown 预览不渲染？**
-`file://` 协议下 CDN 加载的 mermaid.js 受同源策略限制，用 Typora 等本地渲染编辑器打开，或参考 [docs/chart-spec.md](docs/chart-spec.md) 换用 Markdown 表格 / ASCII 条形图通道。
+`file://` 协议下 CDN 加载的 mermaid.js 受同源策略限制，用 Typora 等本地渲染编辑器打开，或参考 [docs/chart-spec.md](skills/data-insight-runbook/docs/chart-spec.md) 换用 Markdown 表格 / ASCII 条形图通道。
 
 **升级 DSH 宿主到 0.1.5 系后旧会话打不开？**
 Session format V3 迁移不可逆，属宿主行为；升级宿主前请先备份会话日志（见 [CHANGELOG.md](CHANGELOG.md) 0.1.4 条目）。
 
 ## 文档
 
-- [docs/chart-spec.md](docs/chart-spec.md) — 三通道图表规范与示例（含 DSH Web GUI 不渲染 Mermaid 的警告）
-- [docs/report-template.md](docs/report-template.md) — 报告骨架 + 严谨性检查清单
-- [examples/](examples/) — 样例 CSV 与完整样例报告
+- [docs/chart-spec.md](skills/data-insight-runbook/docs/chart-spec.md) — 三通道图表规范与示例（含 DSH Web GUI 不渲染 Mermaid 的警告）
+- [docs/report-template.md](skills/data-insight-runbook/docs/report-template.md) — 报告骨架 + 严谨性检查清单
+- [examples/](skills/data-insight-runbook/examples/) — 样例 CSV 与完整样例报告
 - [CHANGELOG.md](CHANGELOG.md) — 版本变更记录
 - [PLUGIN-MAINTENANCE.md](PLUGIN-MAINTENANCE.md) — 本仓维护规则
 
