@@ -13,9 +13,9 @@
 ## 2. 发布前检查清单
 
 1. 运行 `npm test`（`node --test test/csv-profile.test.mjs`，当前 10 例，全绿）。
-2. 运行 `node --check scripts/csv-profile.mjs` 与 `npm run test:compat`。
+2. 运行 `node --check skills/data-insight-runbook/scripts/csv-profile.mjs` 与 `npm run test:compat`。
 3. 改动过 DuckDB 命令时，真机验证**两个模式**：无库文件（内存库，不加 `-readonly`）与有库文件（`-readonly` 只读）。历史教训：DuckDB v1.5.5 实测内存库加 `-readonly` 会报错。
-4. 运行 `npm pack --dry-run`，确认包含 `plugin/index.js`、`cordis.patch.yml`、`skills/`、`docs/`、`scripts/`、`examples/`、双语 `README.md`/`README.zh-CN.md`、`CHANGELOG.md`、`PUBLISHING.md`、`LICENSE`。
+4. 运行 `npm pack --dry-run`，确认包含 `plugin/index.js`、`cordis.patch.yml`、`skills/`（技能目录自包含：`SKILL.md` + `docs/` + `scripts/` + `examples/` 均在其下）、双语 `README.md`/`README.zh-CN.md`、`CHANGELOG.md`、`PUBLISHING.md`、`LICENSE`。
 5. 版本一致性核对：`package.json` version、`CHANGELOG.md` 发布段、git tag 三处一致。
 6. 版本徽章同步：双语 README 的 version 徽章、安装示例 tag、手动安装依赖版本指向最新发布版本。
 
@@ -50,8 +50,8 @@
 ## 5. 安装验证（发布后）
 
 1. 重启 profile（`dsh web` 重开），技能列表应出现 `data-insight-runbook`。
-2. 说「分析 examples/sample-sales.csv 出报告」，确认五阶段执行并产出报告。
-3. 可选：`scripts/setup-duckdb.ps1` 装 DuckDB 后，验证直连只读查询。
+2. 说「分析 skills/data-insight-runbook/examples/sample-sales.csv 出报告」，确认五阶段执行并产出报告。
+3. 可选：`skills/data-insight-runbook/scripts/setup-duckdb.ps1` 装 DuckDB 后，验证直连只读查询。
 
 ## 6. 常见问题
 
