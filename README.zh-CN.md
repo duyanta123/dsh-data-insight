@@ -6,7 +6,7 @@
 [![DeepSeek Harness](https://img.shields.io/badge/DeepSeek%20Harness-plugin-4c1d95)](https://github.com/topics/dsh-plugin)
 [![CI](https://github.com/duyanta123/dsh-data-insight/actions/workflows/ci.yml/badge.svg)](https://github.com/duyanta123/dsh-data-insight/actions/workflows/ci.yml)
 [![dsh-index](https://img.shields.io/badge/dsh--index-dsh--data--insight-blue)](https://dsh-index.xlings.org/packages/dsh-data-insight/)
-[![version](https://img.shields.io/badge/version-0.1.4-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.1.5-green)](CHANGELOG.md)
 
 DSH（DeepSeek Harness）**数据洞察技能插件**：把原始数据变成「业务结论 + 指标数据 + 图表」的结构化 Markdown 分析报告。
 
@@ -29,7 +29,7 @@ dsh-data-insight 处理「数据 → 报告」这一步：输入数据源，产�
 作为 DSH 插件（推荐）：
 
 ```sh
-dsh plugin --profile web add "github:duyanta123/dsh-data-insight#v0.1.4"
+dsh plugin --profile web add "github:duyanta123/dsh-data-insight#v0.1.5"
 ```
 
 或从 npm 安装：
@@ -38,7 +38,7 @@ dsh plugin --profile web add "github:duyanta123/dsh-data-insight#v0.1.4"
 npm install dsh-data-insight
 ```
 
-或手动两步（在目标 profile 目录下）：`package.json` 的 `dependencies` 加 `"dsh-data-insight": "^0.1.4"`，`dsh.profile.bundles` 数组加 `"dsh-data-insight"`。
+或手动两步（在目标 profile 目录下）：`package.json` 的 `dependencies` 加 `"dsh-data-insight": "^0.1.5"`，`dsh.profile.bundles` 数组加 `"dsh-data-insight"`。
 
 兼容性分层：独立 CSV / DuckDB 脚本可运行在 Node.js >= 18；作为 DSH 0.1.5-rc.2 插件验证统一使用 Node.js >= 22.19。运行 `npm run test:compat` 可执行隔离 profile 的 add、dump-config 和启动 smoke test。
 

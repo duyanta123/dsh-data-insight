@@ -2,13 +2,17 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/) 约定。
 
-## [Unreleased]
+## [0.1.5] - 2026-09-17
 
 ### 修复
 - **技能资源路径与 harness 的解析基准不一致，导致 `SKILL.md` 中全部相对路径失效。** harness 加载技能时注入「Base directory for this skill: `<skills>/<name>`」并指示按该基准解析相对路径，而 `docs/`、`scripts/`、`examples/` 原先位于包根，故 `SKILL.md` 里的 `scripts/csv-profile.mjs`、`docs/chart-spec.md`、`docs/report-template.md` 等引用在 agent 运行时一律解析到不存在的路径（阶段 1 的探查脚本与阶段 4 的报告骨架、图表规范因此全部不可达）。现将三者移入 `skills/data-insight-runbook/`，技能目录自包含；相对路径书写不变，`SKILL.md` 无需改动。
 - `package.json` 的 `files` 字段随之移除包根 `docs/`、`scripts/`、`examples/` 条目（嵌套目录已由 `skills/` 递归包含，已用 `npm pack --dry-run` 验证）。
 - 双语 README、`PUBLISHING.md` 中的路径引用与文档链接同步更新。
 - `test/dsh-compat.test.mjs` 新增回归断言：技能引用的资源若存在于包内却位于技能目录之外，立即失败并给出修复指引——原测试只校验 `SKILL.md` frontmatter，未校验其引用的资源可达性，故未能拦住此问题。
+
+### 变更
+- **包内脚本路径变更（影响直接调用者）**：`csv-profile.mjs`、`setup-duckdb.ps1`/`setup-duckdb.sh` 与 `docs/`、`examples/` 现位于 `skills/data-insight-runbook/` 下。按 0.1.4 README 硬编码路径的调用需同步调整，例如 `node node_modules/dsh-data-insight/scripts/csv-profile.mjs` → `node node_modules/dsh-data-insight/skills/data-insight-runbook/scripts/csv-profile.mjs`。技能加载路径不受影响：`SKILL.md` 的相对路径写法与 DSH 侧安装方式均未变。
+- `PLUGIN-MAINTENANCE.md` 的目录树、核心脚本引用与 `files` 白名单描述同步至新布局。
 
 ## [0.1.4] - 2026-09-11
 

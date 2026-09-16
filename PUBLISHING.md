@@ -32,7 +32,7 @@
 ### GitHub
 
 1. push `main`，确认 CI 全绿（ubuntu + windows × Node 22 回归 + Node 22.19 DSH compat job）。
-2. 打 tag `v0.x.y`（与 `package.json` version 一致，如当前 `v0.1.4`）并推送。
+2. 打 tag `v0.x.y`（与 `package.json` version 一致，如当前 `v0.1.5`）并推送。
 3. 给仓库添加 GitHub topic `dsh-plugin`（awesome 收录门槛之一）。
 
 ### npm

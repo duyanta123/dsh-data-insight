@@ -2,7 +2,7 @@
 
 > 数据源：`examples/sample-sales.csv`
 > 时间范围：2025-01-01 ~ 2025-01-10　粒度：日
-> 生成时间：示例　工具：dsh-data-insight v0.1.4
+> 生成时间：示例　工具：dsh-data-insight v0.1.5
 
 ## 一、核心结论
 

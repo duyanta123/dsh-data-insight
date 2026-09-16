@@ -6,7 +6,7 @@ English | [简体中文](README.zh-CN.md)
 [![DeepSeek Harness](https://img.shields.io/badge/DeepSeek%20Harness-plugin-4c1d95)](https://github.com/topics/dsh-plugin)
 [![CI](https://github.com/duyanta123/dsh-data-insight/actions/workflows/ci.yml/badge.svg)](https://github.com/duyanta123/dsh-data-insight/actions/workflows/ci.yml)
 [![dsh-index](https://img.shields.io/badge/dsh--index-dsh--data--insight-blue)](https://dsh-index.xlings.org/packages/dsh-data-insight/)
-[![version](https://img.shields.io/badge/version-0.1.4-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.1.5-green)](CHANGELOG.md)
 
 A DSH (DeepSeek Harness) **data-insight skill plugin**: turns raw data into a structured Markdown analysis report of "business conclusions + metrics + charts".
 
@@ -29,7 +29,7 @@ Rigor guarantees (hard gates baked into the report template): every conclusion b
 As a DSH plugin (recommended):
 
 ```sh
-dsh plugin --profile web add "github:duyanta123/dsh-data-insight#v0.1.4"
+dsh plugin --profile web add "github:duyanta123/dsh-data-insight#v0.1.5"
 ```
 
 Or from npm:
@@ -38,7 +38,7 @@ Or from npm:
 npm install dsh-data-insight
 ```
 
-Or manually in two steps (in the target profile directory): add `"dsh-data-insight": "^0.1.4"` to `dependencies` in `package.json`, and add `"dsh-data-insight"` to the `dsh.profile.bundles` array.
+Or manually in two steps (in the target profile directory): add `"dsh-data-insight": "^0.1.5"` to `dependencies` in `package.json`, and add `"dsh-data-insight"` to the `dsh.profile.bundles` array.
 
 Compatibility tiers: the standalone CSV / DuckDB scripts run on Node.js >= 18; as a DSH 0.1.5-rc.2 plugin it is verified with Node.js >= 22.19. Run `npm run test:compat` to execute an isolated-profile add, dump-config, and startup smoke test.
 
