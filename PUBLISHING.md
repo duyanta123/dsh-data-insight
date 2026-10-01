@@ -25,14 +25,14 @@
 - `cordis.patch.yml` 为 config-tree `- insert:` 补丁格式；harness 加载 `main`（`plugin/index.js`）。
 - `plugin/index.js` 经官方 `@deepseek-ai/dsh-skill-filesystem` 的 `FileSystemSkillProvider` 注册 `skills/` 为技能根（includeDefaultRoots: false）。
 - `skills/data-insight-runbook/SKILL.md` frontmatter 必填 `name`（kebab-case）+ `description`。
-- 安装契约：`dsh plugin --profile <profile> add "github:owner/repo#ref"`；兼容基线 `@deepseek-ai/dsh@0.1.5-rc.2`（Node >= 22.19）。
+- 安装契约：`dsh plugin --profile <profile> add "github:owner/repo#ref"`；兼容基线 `@deepseek-ai/dsh@0.2.0-rc.2`（Node >= 22.19）。
 
 ## 4. 发布渠道
 
 ### GitHub
 
 1. push `main`，确认 CI 全绿（ubuntu + windows × Node 22 回归 + Node 22.19 DSH compat job）。
-2. 打 tag `v0.x.y`（与 `package.json` version 一致，如当前 `v0.1.5`）并推送。
+2. 打 tag `v0.x.y`（与 `package.json` version 一致，如当前 `v0.1.6`）并推送。
 3. 给仓库添加 GitHub topic `dsh-plugin`（awesome 收录门槛之一）。
 
 ### npm

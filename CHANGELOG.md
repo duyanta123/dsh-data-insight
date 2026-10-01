@@ -2,6 +2,12 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/) 约定。
 
+## [0.1.6] - 2026-10-01
+
+### 变更
+- DSH 宿主兼容基线从 `0.1.5-rc.2` 迁移到 `0.2.0-rc.2`：`npm run test:compat` 与 CI compat job 固定安装 `@deepseek-ai/dsh@0.2.0-rc.2` + 同版本 `@deepseek-ai/dsh-skill-filesystem`。全部门禁（隔离 profile 的本地 add、dump-config、npm pack 后打包件 add、有限时长启动冒烟）已在 0.2.0-rc.2 实测通过；上游 v0.2.0-rc.2 发布说明无插件 API / 技能 provider / 技能加载的破坏性变更，`FileSystemSkillProvider` 的 `providerName` / `includeDefaultRoots` / `customSkillDirs` 选项签名不变，插件代码零改动。
+- 提示：`@deepseek-ai/dsh-skill-filesystem` 的 npm `latest` dist-tag 仍停留在 `0.0.1-rc.3`，官方经 `next` 标签分发新版本；本插件 peerDependency 为可选 `*`，不受影响。Node 最低要求维持 >= 22.19。
+
 ## [0.1.5] - 2026-09-17
 
 ### 修复

@@ -8,7 +8,7 @@
 | 项 | 值 |
 |---|---|
 | 类型 | 数据型（原始数据 → 洞察报告） |
-| 当前版本 | 0.1.5 |
+| 当前版本 | 0.1.6 |
 | 分发状态 | dsh-index / awesome-dsh-plugin / awesome-deepseek-harness 已收录 |
 | 运行时 | 零构建 ESM，`plugin/index.js` 由 harness 加载 |
 | 核心脚本 | `skills/data-insight-runbook/scripts/`：`csv-profile.mjs`（零依赖 CSV 探查）+ `setup-duckdb.ps1/.sh` |
@@ -28,14 +28,14 @@ dsh-data-insight/
 │   ├── docs/report-template.md     # 报告模板与严谨性检查清单
 │   └── examples/                   # 样例 CSV 与样例报告
 ├── test/csv-profile.test.mjs       # node --test 契约测试（当前 10 例）
-├── test/dsh-compat.test.mjs        # DSH 0.1.5-rc.2 宿主兼容性门禁
+├── test/dsh-compat.test.mjs        # DSH 0.2.0-rc.2 宿主兼容性门禁
 └── test/fixtures/                  # dirty.csv / ragged.csv / comma-numbers.csv
 ```
 
 ## 3. CI 与测试门禁
 
 - **独立脚本回归**：`npm test`（=`node --test test/csv-profile.test.mjs`），当前 **10 例**；该矩阵只验证业务脚本。
-- **DSH 宿主兼容**：`npm run test:compat` 固定 `@deepseek-ai/dsh@0.1.5-rc.2`，要求 Node >=22.19，执行临时 profile 的 add、dump-config 和有限时长启动。
+- **DSH 宿主兼容**：`npm run test:compat` 固定 `@deepseek-ai/dsh@0.2.0-rc.2`，要求 Node >=22.19，执行临时 profile 的 add、dump-config 和有限时长启动。
 - **GitHub Actions**：`.github/workflows/ci.yml` 保留业务回归，并增加 Node 22.19 compat job。
 - 覆盖点：分隔符探测 / 引号与转义 / 千分位 / 混合类型降级 / 残缺行 / `--limit` / BOM / 退出码。
 
@@ -81,7 +81,7 @@ dsh-data-insight/
 - [ ] `npm test` 全绿（10 例）
 - [ ] 涉及 DuckDB 时，两种模式均已真机验证（内存库 / 只读库）
 - [ ] `CHANGELOG.md` 已归并 `Unreleased`
-- [ ] `npm run test:compat` 通过（DSH 0.1.5-rc.2 / Node 22.19+）
+- [ ] `npm run test:compat` 通过（DSH 0.2.0-rc.2 / Node 22.19+）
 - [ ] `package.json` `version` 与 tag 一致
 - [ ] 双语 README 的 version 徽章与安装示例 tag 已同步
 - [ ] `files` 字段包含所有应发布文件
