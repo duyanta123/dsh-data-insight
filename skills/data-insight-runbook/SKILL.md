@@ -1,6 +1,7 @@
 ---
 name: data-insight-runbook
 description: 数据洞察报告：输入原始数据（CSV 文件 / 粘贴表格 / SQL 查询结果 / DuckDB 直连数据库）→ 输出带图表与业务结论的结构化 Markdown 分析报告。覆盖数据探查、指标计算、同环比、TopN、异常值、图表生成与严谨性检查。需要做数据分析、出报告、看数据、算指标、画图时加载本技能。
+tags: [data-analysis, csv, sql, duckdb, markdown-report, charts]
 ---
 
 # 数据洞察 Runbook
@@ -45,7 +46,7 @@ description: 数据洞察报告：输入原始数据（CSV 文件 / 粘贴表格
 
 ### 1.1 加载与解析
 - CSV：用 `scripts/csv-profile.mjs` 探查（优先），或 read 头几行确认结构。
-- 编码：优先 UTF-8；出现乱码再按 GBK 重读。分隔符：`,` > `\t` > `;` 依次尝试，以「列数一致且无单列吞并」为准。
+- 编码：优先 UTF-8；出现乱码再按 GBK 重读。分隔符：`,` > `\t` > `;` > `|` 依次尝试，以「列数一致且无单列吞并」为准。
 - 记录：文件路径、行数（不含表头）、列数、编码、分隔符。
 
 ### 1.2 探查内容（写入探查记录，供附录引用）
@@ -124,7 +125,7 @@ description: 数据洞察报告：输入原始数据（CSV 文件 / 粘贴表格
 - 若来自 SQL：记录来源查询（脱敏后写入附录），确认是否已聚合。
 
 ### DuckDB 直连
-- **启用检测**：`duckdb --version` 可用才走直连；不可用时 CSV/粘贴仍全功能，直连路径明确告知「需安装 DuckDB（Windows：scripts/setup-duckdb.ps1，macOS/Linux：scripts/setup-duckdb.sh）」，并引导用户运行对应平台的安装脚本，不静默降级。
+- **启用检测**：`duckdb --version` 可用才走直连；不可用时 CSV/粘贴仍全功能，直连路径明确告知「需安装 DuckDB（Windows：scripts/setup-duckdb.ps1，macOS/Linux：scripts/setup-duckdb.sh；或按官方文档 https://duckdb.org/docs/stable/clients/cli/overview 自行安装——Windows 可执行 winget install DuckDB.cli，macOS 可执行 brew install duckdb）」，引导用户安装，不静默降级。
 - **安全红线（必须遵守）**：
   - 连接库文件 / 远程库时一律 `-readonly`（v1.5.5 实测会拦截 INSERT/CREATE 等写语句），禁止任何写库 / 建表 / 破坏性语句。
   - 连接串走环境变量 `DATA_INSIGHT_DB_URL`，禁止把密码写进命令或报告。
@@ -142,6 +143,7 @@ description: 数据洞察报告：输入原始数据（CSV 文件 / 粘贴表格
 - 运行环境受 DSH 文件沙箱限制：读写尽量落在工作区内；`workdir` 必须指向已存在目录。
 - **不要写 Node 脚本去 spawn 子进程**（如脚本内调用 duckdb/ffmpeg）：confined 模式下子进程管道捕获会报 `EPERM`。duckdb 由 runbook 指引通过 shell 工具直接调用；`csv-profile.mjs` 只做纯文件读写与计算，不 spawn 子进程。
 - 需要联网查数据字典 / 口径时用 web_search，不臆造。
+- **本技能包内脚本除 DuckDB 安装脚本外不发起任何网络请求、不下载二进制文件**：`csv-profile.mjs` 仅做本地文件读写；`setup-duckdb.ps1` / `setup-duckdb.sh` 仅在用户明确要求安装 DuckDB 时由用户运行，从官方渠道（winget / brew / duckdb.org / GitHub release）下载 DuckDB CLI。
 
 ## 例外与裁剪
 

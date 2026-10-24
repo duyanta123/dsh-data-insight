@@ -6,7 +6,7 @@
 [![DeepSeek Harness](https://img.shields.io/badge/DeepSeek%20Harness-plugin-4c1d95)](https://github.com/topics/dsh-plugin)
 [![CI](https://github.com/duyanta123/dsh-data-insight/actions/workflows/ci.yml/badge.svg)](https://github.com/duyanta123/dsh-data-insight/actions/workflows/ci.yml)
 [![dsh-index](https://img.shields.io/badge/dsh--index-dsh--data--insight-blue)](https://dsh-index.xlings.org/packages/dsh-data-insight/)
-[![version](https://img.shields.io/badge/version-0.1.6-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.1.7-green)](CHANGELOG.md)
 
 DSH（DeepSeek Harness）**数据洞察技能插件**：把原始数据变成「业务结论 + 指标数据 + 图表」的结构化 Markdown 分析报告。
 
@@ -29,7 +29,7 @@ dsh-data-insight 处理「数据 → 报告」这一步：输入数据源，产�
 作为 DSH 插件（推荐）：
 
 ```sh
-dsh plugin --profile web add "github:duyanta123/dsh-data-insight#v0.1.6"
+dsh plugin --profile web add "github:duyanta123/dsh-data-insight#v0.1.7"
 ```
 
 或从 npm 安装：
@@ -38,9 +38,9 @@ dsh plugin --profile web add "github:duyanta123/dsh-data-insight#v0.1.6"
 npm install dsh-data-insight
 ```
 
-或手动两步（在目标 profile 目录下）：`package.json` 的 `dependencies` 加 `"dsh-data-insight": "^0.1.6"`，`dsh.profile.bundles` 数组加 `"dsh-data-insight"`。
+或手动两步（在目标 profile 目录下）：`package.json` 的 `dependencies` 加 `"dsh-data-insight": "^0.1.7"`，`dsh.profile.bundles` 数组加 `"dsh-data-insight"`。
 
-兼容性分层：独立 CSV / DuckDB 脚本可运行在 Node.js >= 18；作为 DSH 0.2.0-rc.2 插件验证统一使用 Node.js >= 22.19。运行 `npm run test:compat` 可执行隔离 profile 的 add、dump-config 和启动 smoke test。
+兼容性分层：独立 CSV / DuckDB 脚本可运行在 Node.js >= 18；作为 DSH 0.2.1-rc.2 插件验证统一使用 Node.js >= 22.19。`package.json` 声明 `engines: node >=18` 作为安装期下限；DSH 宿主路径的 22.19 下限由 compat 测试强制。运行 `npm run test:compat` 可执行隔离 profile 的 add、dump-config 和启动 smoke test。
 
 重启 profile 后，技能 `data-insight-runbook` 出现在技能列表即可用。
 
@@ -74,8 +74,8 @@ duckdb -readonly -csv -c "SELECT ... LIMIT 5000" "$env:DATA_INSIGHT_DB_URL"
 | 参数 | 默认 | 说明 |
 | --- | --- | --- |
 | `<file>` | - | 要探查的 CSV 文件路径 |
-| `--sep <分隔符>` | 自动探测 | 字段分隔符（自动识别 `,`、`\t`、`;`） |
-| `--encoding <enc>` | utf8 | 文件编码：utf8 / utf16le / latin1（GBK 文件请先转码） |
+| `--sep <分隔符>` | 自动探测 | 字段分隔符（自动识别 `,`、`\t`、`;`、`|`） |
+| `--encoding <enc>` | utf8 | 文件编码：utf8 / utf16le / latin1（GBK 文件请先转码；UTF-16LE BOM 自动剥离；非法值退出码 2） |
 | `--limit <N>` | 0（全部） | 限制读取行数，用于超大数据集抽样探查 |
 | `--json` | - | 以 JSON 输出探查结果 |
 
@@ -122,6 +122,7 @@ Session format V3 迁移不可逆，属宿主行为；升级宿主前请先备�
 - [examples/](skills/data-insight-runbook/examples/) — 样例 CSV 与完整样例报告
 - [CHANGELOG.md](CHANGELOG.md) — 版本变更记录
 - [PLUGIN-MAINTENANCE.md](PLUGIN-MAINTENANCE.md) — 本仓维护规则
+- [DSH-DATA-INSIGHT-开发计划.md](DSH-DATA-INSIGHT-开发计划.md) — 开发计划（回溯整理的审计基准）
 
 ## License
 

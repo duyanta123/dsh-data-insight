@@ -2,6 +2,22 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/) 约定。
 
+## [0.1.7] - 2026-10-24
+
+### 新增
+- `csv-profile.mjs` 数值列新增 **IQR（1.5×IQR 围栏）异常值对照**，与 Z-score（`|z|>3`）组成双口径：JSON 输出新增 `iqr` / `iqrFences` / `iqrOutliers` / `iqrOutlierCount` 字段，文本报告异常值段改为双口径并列并写明围栏。此前 README / SKILL.md / 报告模板承诺 IQR 对照而实现仅有 Z-score，本变更兑现承诺（契约测试扩至 14 例，新增「IQR 检出而 Z-score 漏检」用例）。
+- `csv-profile.mjs` 新增 `--encoding` 合法值校验：仅接受 `utf8` / `utf16le` / `latin1`，非法值以退出码 2 拒绝并提示合法值（此前直接进入 `buf.toString` 抛未捕获异常）。
+- `csv-profile.mjs` 支持 UTF-16LE BOM（`FF FE`）剥离，首列名不再带 U+FEFF；检测到 UTF-16BE BOM（`FE FF`）时明确报错退出码 1。
+- `package.json` 新增 `engines: node >=18`（安装期下限，对齐兄弟仓库惯例；DSH 宿主路径的 Node >=22.19 下限仍由 `test:compat` 强制）。
+
+### 变更
+- DSH 宿主兼容基线从 `0.2.0-rc.2` 迁移到 `0.2.1-rc.2`：`npm run test:compat` 与 CI compat job 固定安装 `@deepseek-ai/dsh@0.2.1-rc.2` + 同版本 `@deepseek-ai/dsh-skill-filesystem`。全部门禁（隔离 profile 的本地 add、dump-config、npm pack 后打包件 add、有限时长启动冒烟）已在 0.2.1-rc.2 真机实测通过（Node v22.21.0 / Windows）；`SKILL.md` frontmatter `tags` 字段被静默忽略的假设在 0.2.1-rc.2 重验成立——启动冒烟无技能加载报错，且同版本 `dsh-skill-filesystem` 的 `parseSkillFile` 仅读取 `name` / `description` / `whenToUse` / `invocation` / `metadata`，未知字段不参与校验；插件代码零改动。
+- `SKILL.md` 合入 `data-insight-runbook.zip`（外部分享导出版，2026-10-18）相对仓库版的 3 处改动：frontmatter 新增 `tags`（已核实 DSH `dsh-skill-filesystem` 0.2.0-rc.2 对未知 frontmatter 字段静默忽略，不影响技能加载）；DuckDB 安装指引在保留内置 `setup-duckdb.ps1/.sh` 的同时补官方文档与 winget/brew 命令；沙箱约束新增「包内脚本不发起网络请求」声明——按仓库实际口径改写为「除 DuckDB 安装脚本外」（安装脚本本身需从官方渠道下载 CLI，zip 版因未含脚本而无需此例外）。该 zip 为导出产物，已加入 `.gitignore`（`*.zip`），技能真源回归仓库。
+- 文档补齐 `|` 分隔符探测（实现自始支持）：双语 README CLI 参数表、SKILL.md 阶段 1.1、脚本头注释。
+- `PUBLISHING.md` exports 描述与 `package.json` 对齐（含 `./package.json` 导出）。
+- 新增 `DSH-DATA-INSIGHT-开发计划.md`：回溯整理的开发计划（明确标注非原始计划，依据 CHANGELOG / 现行门禁整理），补齐作为审计基准的计划文档缺口。
+- `PLUGIN-MAINTENANCE.md` 同步：目录树与维护细则（IQR 双口径联动、导出 zip 处置）、测试数与覆盖点更新。
+
 ## [0.1.6] - 2026-10-01
 
 ### 变更

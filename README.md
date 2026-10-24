@@ -6,7 +6,7 @@ English | [简体中文](README.zh-CN.md)
 [![DeepSeek Harness](https://img.shields.io/badge/DeepSeek%20Harness-plugin-4c1d95)](https://github.com/topics/dsh-plugin)
 [![CI](https://github.com/duyanta123/dsh-data-insight/actions/workflows/ci.yml/badge.svg)](https://github.com/duyanta123/dsh-data-insight/actions/workflows/ci.yml)
 [![dsh-index](https://img.shields.io/badge/dsh--index-dsh--data--insight-blue)](https://dsh-index.xlings.org/packages/dsh-data-insight/)
-[![version](https://img.shields.io/badge/version-0.1.6-green)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.1.7-green)](CHANGELOG.md)
 
 A DSH (DeepSeek Harness) **data-insight skill plugin**: turns raw data into a structured Markdown analysis report of "business conclusions + metrics + charts".
 
@@ -29,7 +29,7 @@ Rigor guarantees (hard gates baked into the report template): every conclusion b
 As a DSH plugin (recommended):
 
 ```sh
-dsh plugin --profile web add "github:duyanta123/dsh-data-insight#v0.1.6"
+dsh plugin --profile web add "github:duyanta123/dsh-data-insight#v0.1.7"
 ```
 
 Or from npm:
@@ -38,9 +38,9 @@ Or from npm:
 npm install dsh-data-insight
 ```
 
-Or manually in two steps (in the target profile directory): add `"dsh-data-insight": "^0.1.6"` to `dependencies` in `package.json`, and add `"dsh-data-insight"` to the `dsh.profile.bundles` array.
+Or manually in two steps (in the target profile directory): add `"dsh-data-insight": "^0.1.7"` to `dependencies` in `package.json`, and add `"dsh-data-insight"` to the `dsh.profile.bundles` array.
 
-Compatibility tiers: the standalone CSV / DuckDB scripts run on Node.js >= 18; as a DSH 0.2.0-rc.2 plugin it is verified with Node.js >= 22.19. Run `npm run test:compat` to execute an isolated-profile add, dump-config, and startup smoke test.
+Compatibility tiers: the standalone CSV / DuckDB scripts run on Node.js >= 18; as a DSH 0.2.1-rc.2 plugin it is verified with Node.js >= 22.19. The npm package declares `engines: node >=18` as the install-time floor; the 22.19 floor for the DSH host path is enforced by the compat test. Run `npm run test:compat` to execute an isolated-profile add, dump-config, and startup smoke test.
 
 After restarting the profile, the `data-insight-runbook` skill appears in the skill list and is ready to use.
 
@@ -74,8 +74,8 @@ duckdb -readonly -csv -c "SELECT ... LIMIT 5000" "$env:DATA_INSIGHT_DB_URL"
 | Option | Default | Description |
 | --- | --- | --- |
 | `<file>` | - | Path to the CSV file to profile |
-| `--sep <char>` | auto-detect | Field separator (auto-detects `,`, `\t`, `;`) |
-| `--encoding <enc>` | utf8 | File encoding: utf8 / utf16le / latin1 (transcode GBK files first) |
+| `--sep <char>` | auto-detect | Field separator (auto-detects `,`, `\t`, `;`, `|`) |
+| `--encoding <enc>` | utf8 | File encoding: utf8 / utf16le / latin1 (GBK: transcode first; UTF-16LE BOM stripped; invalid values exit with code 2) |
 | `--limit <N>` | 0 (all) | Limit rows read, for sampling very large datasets |
 | `--json` | - | Output the profiling result as JSON |
 
@@ -122,6 +122,7 @@ The Session format V3 migration is irreversible and is host behavior; back up se
 - [examples/](skills/data-insight-runbook/examples/) — sample CSV and full sample report
 - [CHANGELOG.md](CHANGELOG.md) — release notes
 - [PLUGIN-MAINTENANCE.md](PLUGIN-MAINTENANCE.md) — repo maintenance runbook
+- [DSH-DATA-INSIGHT-开发计划.md](DSH-DATA-INSIGHT-开发计划.md) — development plan (retrospective audit baseline, in Chinese)
 
 ## License
 

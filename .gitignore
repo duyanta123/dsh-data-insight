@@ -5,6 +5,9 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# 外部分享用技能包导出（如 data-insight-runbook.zip；技能真源始终是 skills/data-insight-runbook/）
+*.zip
+
 # 日志
 *.log
 npm-debug.log*

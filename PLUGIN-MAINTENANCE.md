@@ -8,7 +8,7 @@
 | 项 | 值 |
 |---|---|
 | 类型 | 数据型（原始数据 → 洞察报告） |
-| 当前版本 | 0.1.6 |
+| 当前版本 | 0.1.7 |
 | 分发状态 | dsh-index / awesome-dsh-plugin / awesome-deepseek-harness 已收录 |
 | 运行时 | 零构建 ESM，`plugin/index.js` 由 harness 加载 |
 | 核心脚本 | `skills/data-insight-runbook/scripts/`：`csv-profile.mjs`（零依赖 CSV 探查）+ `setup-duckdb.ps1/.sh` |
@@ -20,6 +20,7 @@ dsh-data-insight/
 ├── package.json                    # npm 包 + dsh.bundle.patch + files 白名单
 ├── cordis.patch.yml                # DSH bundle patch
 ├── plugin/index.js                 # 注册技能根
+├── DSH-DATA-INSIGHT-开发计划.md    # 开发计划（回溯整理，作审计基准；不入 npm 包）
 ├── skills/data-insight-runbook/    # 技能目录（自包含；harness 按此目录解析 SKILL.md 的相对路径）
 │   ├── SKILL.md                    # 五阶段数据洞察 runbook
 │   ├── scripts/csv-profile.mjs     # 确定性 CSV 探查（正确性核心）
@@ -27,17 +28,17 @@ dsh-data-insight/
 │   ├── docs/chart-spec.md          # 三通道图表规范（表格/Mermaid/ASCII）
 │   ├── docs/report-template.md     # 报告模板与严谨性检查清单
 │   └── examples/                   # 样例 CSV 与样例报告
-├── test/csv-profile.test.mjs       # node --test 契约测试（当前 10 例）
-├── test/dsh-compat.test.mjs        # DSH 0.2.0-rc.2 宿主兼容性门禁
+├── test/csv-profile.test.mjs       # node --test 契约测试（当前 14 例）
+├── test/dsh-compat.test.mjs        # DSH 0.2.1-rc.2 宿主兼容性门禁
 └── test/fixtures/                  # dirty.csv / ragged.csv / comma-numbers.csv
 ```
 
 ## 3. CI 与测试门禁
 
-- **独立脚本回归**：`npm test`（=`node --test test/csv-profile.test.mjs`），当前 **10 例**；该矩阵只验证业务脚本。
-- **DSH 宿主兼容**：`npm run test:compat` 固定 `@deepseek-ai/dsh@0.2.0-rc.2`，要求 Node >=22.19，执行临时 profile 的 add、dump-config 和有限时长启动。
+- **独立脚本回归**：`npm test`（=`node --test test/csv-profile.test.mjs`），当前 **14 例**；该矩阵只验证业务脚本。
+- **DSH 宿主兼容**：`npm run test:compat` 固定 `@deepseek-ai/dsh@0.2.1-rc.2`，要求 Node >=22.19，执行临时 profile 的 add、dump-config 和有限时长启动。
 - **GitHub Actions**：`.github/workflows/ci.yml` 保留业务回归，并增加 Node 22.19 compat job。
-- 覆盖点：分隔符探测 / 引号与转义 / 千分位 / 混合类型降级 / 残缺行 / `--limit` / BOM / 退出码。
+- 覆盖点：分隔符探测 / 引号与转义 / 千分位 / 混合类型降级 / 残缺行 / `--limit` / BOM（UTF-8 与 UTF-16LE）/ IQR 对照 / `--encoding` 校验 / 退出码。
 
 ## 4. 一次完整变更的动作序列
 
@@ -54,6 +55,7 @@ dsh-data-insight/
 ### 5.1 CSV 探查脚本变更（`csv-profile.mjs`）
 - **高风险区**：分隔符探测、类型推断、编码处理、残缺行容错。
 - 每次新增数据形态，必须补对应 fixture（如新的 dirty.csv / 特殊编码文件）与契约用例。
+- 异常值为 **Z-score（|z|>3）与 IQR（1.5×IQR 围栏）双口径**：改动任一口径时，同步 `SKILL.md` 阶段 2.4、`docs/report-template.md` 附录 A、`examples/sample-report.md` 与双语 README 的承诺表述。
 - 尤其注意 Windows 环境差异（GBK 编码、CRLF）与 macOS/Linux 环境的回归。
 
 ### 5.2 DuckDB 命令调整（⚠️ 最高风险区）
@@ -69,7 +71,8 @@ dsh-data-insight/
 ### 5.4 元数据与打包
 - 改动对外描述时同步：`README.md` / `README.zh-CN.md` 首段（双语，结构一致）、`package.json` 的 `description`/`keywords`、awesome-dsh-plugin 的 `data/plugins/duyanta123__dsh-data-insight.yml`。
 - 发版时同步双语 README 的 version 徽章、安装示例 tag 与手动安装依赖版本。
-- `files` 白名单已含 `plugin/index.js`、`cordis.patch.yml`、`skills/`（技能目录自包含：`SKILL.md` + `docs/` + `scripts/` + `examples/` 均在其下，已由 `skills/` 递归包含）、双语 `README.md`/`README.zh-CN.md`、`CHANGELOG.md`、`PUBLISHING.md`、`LICENSE`——`PLUGIN-MAINTENANCE.md` 为仓库维护资产，不在 npm 包内；新增顶层资产时记得核对。
+- `data-insight-runbook.zip` 之类技能包 zip 是**外部分享导出产物**（已由 `.gitignore` 的 `*.zip` 排除，不入库、不随 npm 包发布）；技能真源始终是 `skills/data-insight-runbook/`，导出前应先与仓库内容对齐。
+- `files` 白名单已含 `plugin/index.js`、`cordis.patch.yml`、`skills/`（技能目录自包含：`SKILL.md` + `docs/` + `scripts/` + `examples/` 均在其下，已由 `skills/` 递归包含）、双语 `README.md`/`README.zh-CN.md`、`CHANGELOG.md`、`PUBLISHING.md`、`LICENSE`——`PLUGIN-MAINTENANCE.md` 与 `DSH-DATA-INSIGHT-开发计划.md` 为仓库维护资产，不在 npm 包内；新增顶层资产时记得核对。
 
 ## 6. 版本与发布节奏
 
@@ -78,10 +81,10 @@ dsh-data-insight/
 
 ## 7. 发布前清单
 
-- [ ] `npm test` 全绿（10 例）
+- [ ] `npm test` 全绿（14 例）
 - [ ] 涉及 DuckDB 时，两种模式均已真机验证（内存库 / 只读库）
 - [ ] `CHANGELOG.md` 已归并 `Unreleased`
-- [ ] `npm run test:compat` 通过（DSH 0.2.0-rc.2 / Node 22.19+）
+- [ ] `npm run test:compat` 通过（DSH 0.2.1-rc.2 / Node 22.19+）
 - [ ] `package.json` `version` 与 tag 一致
 - [ ] 双语 README 的 version 徽章与安装示例 tag 已同步
 - [ ] `files` 字段包含所有应发布文件

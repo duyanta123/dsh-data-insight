@@ -9,8 +9,10 @@
  *   node csv-profile.mjs <file> [--sep <分隔符>] [--encoding <utf8|utf16le|latin1>] [--limit <N>] [--json]
  *
  * 说明：
- *   - 默认自动探测分隔符（, \t ;）。
- *   - 编码默认 utf8；GBK 文件请先转码（PowerShell:  Get-Content -Encoding GBK file | Set-Content -Encoding UTF8 out）。
+ *   - 默认自动探测分隔符（, \t ; |，按首行出现次数取最多，并列时靠前者优先）。
+ *   - 编码默认 utf8；--encoding 仅接受 utf8 / utf16le / latin1，传其他值以退出码 2 拒绝；
+ *     UTF-16LE 文件的 FF FE BOM 会被剥离，UTF-16BE（FE FF）不支持、明确报错。
+ *     GBK 文件请先转码（PowerShell:  Get-Content -Encoding GBK file | Set-Content -Encoding UTF8 out）。
  *   - --limit 限制读取行数（默认 0 = 全部），用于超大数据集抽样探查。
  */
 
@@ -33,11 +35,23 @@ if (!file) {
   process.exit(2);
 }
 
+const VALID_ENCODINGS = new Set(["utf8", "utf16le", "latin1"]);
+if (!VALID_ENCODINGS.has(encoding)) {
+  console.error(`无效的 --encoding 值: ${encoding}（可选 utf8|utf16le|latin1）`);
+  process.exit(2);
+}
+
 // ── 读取与编码 ─────────────────────────────────────────────────────────────
 let text;
 try {
   const buf = readFileSync(file);
-  if (buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) text = buf.slice(3).toString(encoding);
+  if (encoding === "utf16le") {
+    if (buf[0] === 0xff && buf[1] === 0xfe) text = buf.slice(2).toString("utf16le"); // UTF-16LE BOM
+    else if (buf[0] === 0xfe && buf[1] === 0xff) {
+      console.error("检测到 UTF-16BE BOM（FE FF）：本脚本仅支持 UTF-16LE，请先转码为 UTF-8 再探查。");
+      process.exit(1);
+    } else text = buf.toString("utf16le");
+  } else if (buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) text = buf.slice(3).toString(encoding);
   else text = buf.toString(encoding);
 } catch (e) {
   console.error(`读取失败: ${e.message}`);
@@ -169,14 +183,24 @@ const cols = header.map((name, i) => {
     // Z-score 异常值 (|z| > 3)
     const m = info.mean;
     const s = info.stddev || 1;
+    // IQR 异常值对照：1.5×IQR 围栏（P25−1.5×IQR / P75+1.5×IQR）之外判为异常
+    const iqr = info.p75 - info.p25;
+    const fenceLo = info.p25 - 1.5 * iqr;
+    const fenceHi = info.p75 + 1.5 * iqr;
+    info.iqr = iqr;
+    info.iqrFences = [fenceLo, fenceHi];
     const outliers = [];
+    const iqrOutliers = [];
     vals.forEach((v, idx) => {
       if (v.trim() === "") return;
       const x = toNum(v);
       if (Math.abs((x - m) / s) > 3) outliers.push({ row: idx + 2, value: x });
+      if (x < fenceLo || x > fenceHi) iqrOutliers.push({ row: idx + 2, value: x });
     });
     info.outliers = outliers.slice(0, 20);
     info.outlierCount = outliers.length;
+    info.iqrOutliers = iqrOutliers.slice(0, 20);
+    info.iqrOutlierCount = iqrOutliers.length;
   } else if (type === "text") {
     const freq = new Map();
     vals.forEach((v) => {
@@ -249,15 +273,21 @@ for (const c of cols) {
   out.push(`| ${c.name} | ${c.type} | ${c.missing} | ${c.missingRate}% | ${summary} |`);
 }
 out.push(``);
-const hasOutliers = cols.some((c) => c.type === "number" && c.outlierCount > 0);
+const hasOutliers = cols.some((c) => c.type === "number" && (c.outlierCount > 0 || c.iqrOutlierCount > 0));
 if (hasOutliers) {
-  out.push(`## 数值异常值（Z-score |z|>3）`);
+  out.push(`## 数值异常值（Z-score |z|>3；IQR 1.5×IQR 对照）`);
   for (const c of cols) {
-    if (c.type === "number" && c.outlierCount > 0) {
-      out.push(`- **${c.name}**：${c.outlierCount} 个异常值，示例：${c.outliers.map((o) => `行${o.row}=${fmt(o.value)}`).join(", ")}`);
+    if (c.type === "number" && (c.outlierCount > 0 || c.iqrOutlierCount > 0)) {
+      const zPart = c.outlierCount > 0
+        ? `Z-score ${c.outlierCount} 个：${c.outliers.map((o) => `行${o.row}=${fmt(o.value)}`).join(", ")}`
+        : "Z-score 0 个";
+      const iqrPart = c.iqrOutlierCount > 0
+        ? `IQR ${c.iqrOutlierCount} 个：${c.iqrOutliers.map((o) => `行${o.row}=${fmt(o.value)}`).join(", ")}（围栏 ${fmt(c.iqrFences[0])} ~ ${fmt(c.iqrFences[1])}）`
+        : "IQR 0 个";
+      out.push(`- **${c.name}**：${zPart}；${iqrPart}`);
     }
   }
   out.push(``);
 }
-out.push(`> 说明：缺失值按空字符串判定；数值型已去除千分位逗号。GBK 文件请先转码为 UTF-8。`);
+out.push(`> 说明：缺失值按空字符串判定；数值型已去除千分位逗号。异常值口径：Z-score |z|>3 与 IQR（P25−1.5×IQR / P75+1.5×IQR）双口径对照。GBK 文件请先转码为 UTF-8。`);
 console.log(out.join("\n"));

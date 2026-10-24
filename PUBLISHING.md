@@ -6,13 +6,13 @@
 
 - npm 包名：`dsh-data-insight`（与 GitHub 仓库名一致，2026-09 首发时经 `npm view` 确认未占用）。
 - GitHub 仓库名：`duyanta123/dsh-data-insight`。
-- exports 仅根路径（`./plugin/index.js`），无 bin 命令、无子路径导出。
+- exports 仅根路径（`./plugin/index.js`）与 `./package.json`，无 bin 命令、无其他子路径导出。
 - cordis.patch.yml 插件行 id/name 为 `dsh-data-insight`。
 - README 双语：`README.md` 为英文、`README.zh-CN.md` 为中文，顶部互链；两者章节结构必须一致，改动描述时同步更新。
 
 ## 2. 发布前检查清单
 
-1. 运行 `npm test`（`node --test test/csv-profile.test.mjs`，当前 10 例，全绿）。
+1. 运行 `npm test`（`node --test test/csv-profile.test.mjs`，当前 14 例，全绿）。
 2. 运行 `node --check skills/data-insight-runbook/scripts/csv-profile.mjs` 与 `npm run test:compat`。
 3. 改动过 DuckDB 命令时，真机验证**两个模式**：无库文件（内存库，不加 `-readonly`）与有库文件（`-readonly` 只读）。历史教训：DuckDB v1.5.5 实测内存库加 `-readonly` 会报错。
 4. 运行 `npm pack --dry-run`，确认包含 `plugin/index.js`、`cordis.patch.yml`、`skills/`（技能目录自包含：`SKILL.md` + `docs/` + `scripts/` + `examples/` 均在其下）、双语 `README.md`/`README.zh-CN.md`、`CHANGELOG.md`、`PUBLISHING.md`、`LICENSE`。
@@ -25,14 +25,14 @@
 - `cordis.patch.yml` 为 config-tree `- insert:` 补丁格式；harness 加载 `main`（`plugin/index.js`）。
 - `plugin/index.js` 经官方 `@deepseek-ai/dsh-skill-filesystem` 的 `FileSystemSkillProvider` 注册 `skills/` 为技能根（includeDefaultRoots: false）。
 - `skills/data-insight-runbook/SKILL.md` frontmatter 必填 `name`（kebab-case）+ `description`。
-- 安装契约：`dsh plugin --profile <profile> add "github:owner/repo#ref"`；兼容基线 `@deepseek-ai/dsh@0.2.0-rc.2`（Node >= 22.19）。
+- 安装契约：`dsh plugin --profile <profile> add "github:owner/repo#ref"`；兼容基线 `@deepseek-ai/dsh@0.2.1-rc.2`（Node >= 22.19）。
 
 ## 4. 发布渠道
 
 ### GitHub
 
 1. push `main`，确认 CI 全绿（ubuntu + windows × Node 22 回归 + Node 22.19 DSH compat job）。
-2. 打 tag `v0.x.y`（与 `package.json` version 一致，如当前 `v0.1.6`）并推送。
+2. 打 tag `v0.x.y`（与 `package.json` version 一致，如当前 `v0.1.7`）并推送。
 3. 给仓库添加 GitHub topic `dsh-plugin`（awesome 收录门槛之一）。
 
 ### npm

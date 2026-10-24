@@ -47,10 +47,17 @@ test("样例 CSV：行数/列数/重复行/缺失/异常值全链路", () => {
   assert.equal(orders.outlierCount, 1);
   assert.equal(orders.outliers[0].row, 26);
   assert.equal(orders.outliers[0].value, 900);
+  // IQR 1.5× 对照（P25=38.5 / P75=106.25 → 围栏 -63.125 ~ 207.875，900 出上围栏）
+  assert.equal(orders.iqrOutlierCount, 1);
+  assert.equal(orders.iqrOutliers[0].row, 26);
+  assert.equal(orders.iqrOutliers[0].value, 900);
+  assert.equal(orders.iqrFences[1], 207.875);
 
   const revenue = col(json, "revenue");
   assert.equal(revenue.outliers[0].row, 26);
   assert.equal(revenue.outliers[0].value, 120000);
+  assert.equal(revenue.iqrOutlierCount, 1);
+  assert.equal(revenue.iqrOutliers[0].row, 26);
 
   assert.equal(col(json, "date").type, "date");
   assert.equal(col(json, "channel").type, "text");
@@ -127,11 +134,65 @@ test("UTF-8 BOM 剥离：首列名不带 \\uFEFF", () => {
   }
 });
 
+test("IQR 1.5× 对照：小样本重尾下 IQR 检出而 Z-score 漏检", () => {
+  const f = join(tmpdir(), "di-test-iqr.csv");
+  // 1..9 + 100：mean=14.5, std≈28.60 → z(100)≈2.99 不到 3；P25=3.25 / P75=7.75 → 上围栏 14.5，100 出围栏
+  writeFileSync(f, "v\n1\n2\n3\n4\n5\n6\n7\n8\n9\n100\n");
+  try {
+    const { code, json } = run(f, "--json");
+    assert.equal(code, 0);
+    const v = col(json, "v");
+    assert.equal(v.type, "number");
+    assert.equal(v.outlierCount, 0, "Z-score |z|>3 不应检出");
+    assert.equal(v.iqr, 4.5);
+    assert.equal(v.iqrFences[0], -3.5);
+    assert.equal(v.iqrFences[1], 14.5);
+    assert.equal(v.iqrOutlierCount, 1, "IQR 对照应检出 100");
+    assert.equal(v.iqrOutliers[0].value, 100);
+  } finally {
+    rmSync(f, { force: true });
+  }
+});
+
+test("utf16le：FF FE BOM 剥离，首列名不带 U+FEFF", () => {
+  const f = join(tmpdir(), "di-test-utf16le.csv");
+  writeFileSync(f, Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from("name,qty\n甲,1\n乙,2\n", "utf16le")]));
+  try {
+    const { code, json } = run(f, "--json", "--encoding", "utf16le");
+    assert.equal(code, 0);
+    assert.ok(json.columnsDetail.some((c) => c.name === "name"), "UTF-16LE BOM 应被剥离");
+    assert.equal(json.rows, 2);
+    assert.equal(col(json, "qty").max, 2);
+  } finally {
+    rmSync(f, { force: true });
+  }
+});
+
+test("utf16le：UTF-16BE BOM（FE FF）明确报错并退出码 1", () => {
+  const f = join(tmpdir(), "di-test-utf16be.csv");
+  writeFileSync(f, Buffer.concat([Buffer.from([0xfe, 0xff]), Buffer.from("name,qty\n1,2\n", "utf16le")]));
+  try {
+    const { code, stderr } = run(f, "--json", "--encoding", "utf16le");
+    assert.equal(code, 1);
+    assert.ok(stderr.includes("UTF-16BE"), "应提示 BE 不受支持");
+  } finally {
+    rmSync(f, { force: true });
+  }
+});
+
+test("无效 --encoding 以退出码 2 拒绝并提示合法值", () => {
+  const r = run(join(skill, "examples", "sample-sales.csv"), "--json", "--encoding", "gbk");
+  assert.equal(r.code, 2);
+  assert.ok(r.stderr.includes("utf8|utf16le|latin1"));
+});
+
 test("文本模式输出为 Markdown 报告", () => {
   const { stdout } = run(join(skill, "examples", "sample-sales.csv"));
   assert.ok(stdout.includes("# CSV 数据探查报告"));
   assert.ok(stdout.includes("## Schema 与质量"));
   assert.ok(stdout.includes("重复行：1"));
+  assert.ok(stdout.includes("## 数值异常值（Z-score |z|>3；IQR 1.5×IQR 对照）"), "异常值段应为双口径");
+  assert.ok(stdout.includes("IQR（P25−1.5×IQR / P75+1.5×IQR）"), "说明行应写明 IQR 口径");
 });
 
 test("缺参数退出码 2；文件不存在退出码 1", () => {
